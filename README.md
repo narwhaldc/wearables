@@ -22,7 +22,14 @@ The single-vendor **oura_health** app remains the GA fallback.
 - Per-person **RBAC** via role `srchFilter` on the indexed `person_id`, and an
   admin-managed `person_id → name/goals` enrichment lookup (in the add-on).
 
+## Scheduled maintenance
+`default/savedsearches.conf` ships a two-pass **index dedup** for `index=wearables`
+(tag duplicates → delete), mirroring oura_health's, scheduled **one hour later**
+(Pass 1 03:00, Pass 2 03:15) so both apps coexist without overlapping. Pass 2's
+`| delete` requires the running role to hold **`can_delete`**. A manual *Verify*
+search reports the current duplicate percentage.
+
 ## Status
-0.1.0 — scaffold: data model defined + overview page. Dashboard migration from
+0.1.0 — scaffold: data model + overview page + dedup maintenance. Dashboard migration from
 `oura_health` (Today / Sleep / Heart / Activity / Wellness / Device) is in
 progress. Apache-2.0.
