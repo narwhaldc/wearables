@@ -3,7 +3,7 @@
   "displayName": "Wearables",
   "description": "Vendor-neutral wearables metrics (sleep, heart rate, activity) normalized across devices by per-vendor add-ons (TA-oura, TA-garmin, ...).",
   "objectSummary": {
-    "Event-Based": 5,
+    "Event-Based": 6,
     "Search-Based": 0,
     "Transaction-Based": 0
   },
@@ -1074,6 +1074,177 @@
           "hidden": false,
           "editable": true,
           "displayName": "sleep_time_status",
+          "comment": ""
+        }
+      ],
+      "calculations": []
+    },
+    {
+      "objectName": "Device",
+      "displayName": "Device",
+      "parentName": "BaseEvent",
+      "comment": "Device hardware + battery. tag=wearable_device; wearable_dataset=battery (time-series level/charge state) or device_config (color/design/hw/fw/size/setup). Any vendor TA maps its device data to these fields.",
+      "constraints": [
+        {
+          "search": "tag=wearable_device"
+        }
+      ],
+      "lineage": "Device",
+      "fields": [
+        {
+          "fieldName": "vendor",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "vendor",
+          "comment": ""
+        },
+        {
+          "fieldName": "person_id",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "person_id (canonical, indexed RBAC key)",
+          "comment": ""
+        },
+        {
+          "fieldName": "person_name",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "person_name (from enrichment lookup)",
+          "comment": ""
+        },
+        {
+          "fieldName": "wearable_dataset",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "wearable_dataset (battery|device_config)",
+          "comment": ""
+        },
+        {
+          "fieldName": "battery_level",
+          "owner": "Device",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "battery_level",
+          "comment": ""
+        },
+        {
+          "fieldName": "charging",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "charging",
+          "comment": ""
+        },
+        {
+          "fieldName": "on_charger",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "on_charger",
+          "comment": ""
+        },
+        {
+          "fieldName": "device_color",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "device_color",
+          "comment": ""
+        },
+        {
+          "fieldName": "device_design",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "device_design",
+          "comment": ""
+        },
+        {
+          "fieldName": "device_hw_version",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "device_hw_version",
+          "comment": ""
+        },
+        {
+          "fieldName": "device_fw_version",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "device_fw_version",
+          "comment": ""
+        },
+        {
+          "fieldName": "device_size",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "device_size",
+          "comment": ""
+        },
+        {
+          "fieldName": "device_setup_date",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "device_setup_date",
           "comment": ""
         }
       ],
