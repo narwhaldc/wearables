@@ -37,6 +37,8 @@ P002,Alex,8000,6000,500
 old hardcoded 10K step goal.
 
 ## Step 2 — Create one role per person
+> **Where this lives:** roles are *deployment* config — **not shipped in the app `.spl`**. A copy-paste template is in [`examples/authorize.conf.example`](examples/authorize.conf.example) (repo-only). Self-managed: apply to `$SPLUNK_HOME/etc/system/local/authorize.conf`. Splunk Cloud: recreate as roles via Settings → Roles / ACS (Cloud ignores app-provided authorize.conf).
+
 **Self-managed** — `authorize.conf` (app or system context):
 ```
 [role_wearables_P001]

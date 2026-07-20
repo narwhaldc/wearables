@@ -1,0 +1,41 @@
+## ===========================================================================
+## Wearables RBAC — authorize.conf TEMPLATE  (do NOT ship this in the app)
+## ===========================================================================
+## This file is intentionally NOT part of the packaged .spl. Roles are
+## deployment config (person_ids differ per install, and Splunk Cloud manages
+## roles via ACS/Settings->Roles, ignoring app-provided authorize.conf).
+##
+## APPLY IT:
+##   - Self-managed: copy the stanzas into $SPLUNK_HOME/etc/system/local/authorize.conf
+##                   (or a dedicated org app in that context), then restart / reload.
+##   - Splunk Cloud: recreate these as roles in Settings -> Roles (or via ACS) —
+##                   set "Restrict search terms" = person_id="P00x" and allow the
+##                   wearables index. Do not upload this file.
+##
+## The access boundary is srchFilter on the INDEXED person_id. The lookups are
+## enrichment only. See RBAC.md for the full procedure + verification.
+## ===========================================================================
+
+## One role PER PERSON — sees only their own data.
+[role_wearables_P001]
+importRoles        = user            # capabilities only (must NOT itself grant wearables unfiltered)
+srchIndexesAllowed = wearables
+srchIndexesDefault = wearables
+srchFilter         = person_id="P001"
+## No admin_all_objects, no run_collect.
+
+# [role_wearables_P002]
+# importRoles        = user
+# srchIndexesAllowed = wearables
+# srchIndexesDefault = wearables
+# srchFilter         = person_id="P002"
+
+## Household / admin overview — sees everyone (no srchFilter).
+[role_wearables_household]
+importRoles        = user
+srchIndexesAllowed = wearables
+srchIndexesDefault = wearables
+
+## GOTCHA: srchFilters across a user's roles are OR'd (most-permissive). The
+## person role must be the ONLY role granting the wearables index — ensure the
+## base 'user' role does not grant it unfiltered.
