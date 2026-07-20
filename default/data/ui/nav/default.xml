@@ -3,6 +3,7 @@
   <view name="wearables_sleep" label="Sleep" icon="chartgauge"/>
   <view name="wearables_heart" label="Heart Health" icon="pulse"/>
   <view name="wearables_activity" label="Activity" icon="running"/>
+  <view name="wearables_wellness" label="Wellness" icon="heart"/>
   <view name="wearables_overview" label="Overview" icon="bookmark"/>
   <collection label="Explore" icon="magnifier">
     <view name="search" label="Search"/>
