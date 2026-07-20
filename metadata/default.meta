@@ -17,8 +17,10 @@ export = system
 [views]
 export = system
 
-## Shared person lookups — write-locked to admin/sc_admin, exported global so
-## every vendor add-on's enrichment + all dashboards resolve them.
+## Shared person/device registries — KV Store backed (collections.conf), write-locked
+## to admin/sc_admin, exported global so every vendor add-on's enrichment + all
+## dashboards resolve them. The KV collections (not CSVs) hold the data, so admin
+## edits survive app upgrades.
 [transforms/wearable_identity_map]
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
@@ -27,19 +29,20 @@ export = system
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
 
-[lookups/wearable_identity_map.csv]
-access = read : [ * ], write : [ admin, sc_admin ]
-export = system
-
-[lookups/wearable_person_profile.csv]
-access = read : [ * ], write : [ admin, sc_admin ]
-export = system
-
-## Device registry (device_id -> friendly name). Enrichment only; write-locked.
 [transforms/wearable_device_profile]
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
 
-[lookups/wearable_device_profile.csv]
+## KV Store collections — read broad, WRITE locked to admin/sc_admin (this is the
+## write-integrity gate: restricted users cannot outputlookup / REST-write these).
+[collections/wearable_identity_map]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+[collections/wearable_person_profile]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+[collections/wearable_device_profile]
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
