@@ -1128,6 +1128,30 @@
           "comment": ""
         },
         {
+          "fieldName": "device_id",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "device_id (vendor:vendor_user_id \u2014 view filter, not RBAC)",
+          "comment": ""
+        },
+        {
+          "fieldName": "device_name",
+          "owner": "Device",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "device_name (from device registry lookup)",
+          "comment": ""
+        },
+        {
           "fieldName": "wearable_dataset",
           "owner": "Device",
           "type": "string",

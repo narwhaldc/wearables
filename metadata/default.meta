@@ -34,3 +34,12 @@ export = system
 [lookups/wearable_person_profile.csv]
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
+
+## Device registry (device_id -> friendly name). Enrichment only; write-locked.
+[transforms/wearable_device_profile]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+[lookups/wearable_device_profile.csv]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
