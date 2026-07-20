@@ -1,4 +1,4 @@
-# wearables — Splunk app (vendor-neutral wearables dashboards)
+# Wearables Health — Splunk app (vendor-neutral wearables dashboards)
 
 Dashboards over the **Wearables data model** — one panel set that works across
 devices. Companion to per-vendor add-ons (`TA-oura`, and later `TA-garmin`, …).
