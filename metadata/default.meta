@@ -16,3 +16,21 @@ export = system
 ## Views/nav readable by all, editable by admin only.
 [views]
 export = system
+
+## Shared person lookups — write-locked to admin/sc_admin, exported global so
+## every vendor add-on's enrichment + all dashboards resolve them.
+[transforms/wearable_identity_map]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+[transforms/wearable_person_profile]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+[lookups/wearable_identity_map.csv]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+[lookups/wearable_person_profile.csv]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
