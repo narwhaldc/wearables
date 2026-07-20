@@ -247,6 +247,90 @@
           "editable": true,
           "displayName": "spo2_avg",
           "comment": ""
+        },
+        {
+          "fieldName": "sleep_contrib_deep_sleep",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sleep_contrib_deep_sleep",
+          "comment": ""
+        },
+        {
+          "fieldName": "sleep_contrib_efficiency",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sleep_contrib_efficiency",
+          "comment": ""
+        },
+        {
+          "fieldName": "sleep_contrib_latency",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sleep_contrib_latency",
+          "comment": ""
+        },
+        {
+          "fieldName": "sleep_contrib_rem_sleep",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sleep_contrib_rem_sleep",
+          "comment": ""
+        },
+        {
+          "fieldName": "sleep_contrib_restfulness",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sleep_contrib_restfulness",
+          "comment": ""
+        },
+        {
+          "fieldName": "sleep_contrib_timing",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sleep_contrib_timing",
+          "comment": ""
+        },
+        {
+          "fieldName": "sleep_contrib_total_sleep",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sleep_contrib_total_sleep",
+          "comment": ""
         }
       ],
       "calculations": []
@@ -1074,6 +1158,54 @@
           "hidden": false,
           "editable": true,
           "displayName": "sleep_time_status",
+          "comment": ""
+        },
+        {
+          "fieldName": "readiness_contrib_activity_balance",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "readiness_contrib_activity_balance",
+          "comment": ""
+        },
+        {
+          "fieldName": "readiness_contrib_previous_day_activity",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "readiness_contrib_previous_day_activity",
+          "comment": ""
+        },
+        {
+          "fieldName": "readiness_contrib_previous_night",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "readiness_contrib_previous_night",
+          "comment": ""
+        },
+        {
+          "fieldName": "readiness_contrib_sleep_balance",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "readiness_contrib_sleep_balance",
           "comment": ""
         }
       ],
