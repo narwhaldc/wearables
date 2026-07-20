@@ -19,8 +19,9 @@ Two independent guarantees:
 ## Prerequisites
 - `index=wearables` exists; data is flowing with indexed fields `person_id` +
   `vendor` (see the fetcher / `TA-oura`).
-- `TA-oura` installed (provides the `wearable_person_profile` enrichment lookup,
-  write-locked to admin/sc_admin).
+- `TA-oura` installed (normalizes + tags the data). The `wearable_person_profile`
+  enrichment lookup lives in the **wearables** app (exported global, write-locked
+  to admin/sc_admin).
 
 ---
 
@@ -39,7 +40,7 @@ old hardcoded 10K step goal.
 ## Step 2 — Create one role per person
 > **Where this lives:** roles are *deployment* config — **not shipped in the app `.spl`**. A copy-paste template is in [`examples/authorize.conf.example`](examples/authorize.conf.example) (repo-only). Self-managed: apply to `$SPLUNK_HOME/etc/system/local/authorize.conf`. Splunk Cloud: recreate as roles via Settings → Roles / ACS (Cloud ignores app-provided authorize.conf).
 
-**Self-managed** — `authorize.conf` (app or system context):
+**Self-managed** — `authorize.conf` in **`$SPLUNK_HOME/etc/system/local/`** (not the app):
 ```
 [role_wearables_P001]
 importRoles        = user            # capabilities only
@@ -76,7 +77,7 @@ Household viewers get `role_wearables_household`.
 - Person-roles must **not** have `admin_all_objects` (bypasses lookup write ACLs)
   or `run_collect`/write to `index=wearables` (event injection).
 - Confirm the lookups are write-locked to `admin`/`sc_admin` (they are, via
-  `TA-oura/metadata/default.meta`).
+  `wearables/metadata/default.meta`).
 
 ## Step 5 — Verify (don't trust, test)
 Log in as a **restricted person-user** (e.g. mapped to `role_wearables_P001`)
