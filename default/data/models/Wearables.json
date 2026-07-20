@@ -1,0 +1,477 @@
+{
+  "modelName": "Wearables",
+  "displayName": "Wearables",
+  "description": "Vendor-neutral wearables metrics (sleep, heart rate, activity) normalized across devices by per-vendor add-ons (TA-oura, TA-garmin, ...).",
+  "objectSummary": {
+    "Event-Based": 3,
+    "Search-Based": 0,
+    "Transaction-Based": 0
+  },
+  "objects": [
+    {
+      "objectName": "Sleep",
+      "displayName": "Sleep",
+      "parentName": "BaseEvent",
+      "comment": "One row per sleep record (session or daily summary). Each vendor TA tags its sleep events wearable_sleep and maps to the canonical fields below.",
+      "constraints": [
+        {
+          "search": "tag=wearable_sleep"
+        }
+      ],
+      "lineage": "Sleep",
+      "fields": [
+        {
+          "fieldName": "vendor",
+          "owner": "Sleep",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "vendor",
+          "comment": ""
+        },
+        {
+          "fieldName": "person_id",
+          "owner": "Sleep",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "person_id (canonical, indexed RBAC key)",
+          "comment": ""
+        },
+        {
+          "fieldName": "person_name",
+          "owner": "Sleep",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "person_name (from enrichment lookup)",
+          "comment": ""
+        },
+        {
+          "fieldName": "day",
+          "owner": "Sleep",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "day",
+          "comment": ""
+        },
+        {
+          "fieldName": "sleep_type",
+          "owner": "Sleep",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sleep_type (long_sleep|nap)",
+          "comment": ""
+        },
+        {
+          "fieldName": "total_sleep_min",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "total_sleep_min",
+          "comment": ""
+        },
+        {
+          "fieldName": "time_in_bed_min",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "time_in_bed_min",
+          "comment": ""
+        },
+        {
+          "fieldName": "awake_min",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "awake_min",
+          "comment": ""
+        },
+        {
+          "fieldName": "deep_min",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "deep_min",
+          "comment": ""
+        },
+        {
+          "fieldName": "light_min",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "light_min",
+          "comment": ""
+        },
+        {
+          "fieldName": "rem_min",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "rem_min",
+          "comment": ""
+        },
+        {
+          "fieldName": "efficiency_pct",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "efficiency_pct",
+          "comment": ""
+        },
+        {
+          "fieldName": "latency_min",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "latency_min",
+          "comment": ""
+        },
+        {
+          "fieldName": "sleep_score",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sleep_score",
+          "comment": ""
+        },
+        {
+          "fieldName": "avg_hr",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "avg_hr",
+          "comment": ""
+        },
+        {
+          "fieldName": "lowest_hr",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "lowest_hr",
+          "comment": ""
+        },
+        {
+          "fieldName": "hrv_avg",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "hrv_avg",
+          "comment": ""
+        },
+        {
+          "fieldName": "respiration_avg",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "respiration_avg",
+          "comment": ""
+        },
+        {
+          "fieldName": "spo2_avg",
+          "owner": "Sleep",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "spo2_avg",
+          "comment": ""
+        }
+      ],
+      "calculations": []
+    },
+    {
+      "objectName": "HeartRate",
+      "displayName": "Heart Rate",
+      "parentName": "BaseEvent",
+      "comment": "Intraday heart-rate samples. Backed once each vendor TA tags wearable_heartrate (Oura HR increment pending).",
+      "constraints": [
+        {
+          "search": "tag=wearable_heartrate"
+        }
+      ],
+      "lineage": "HeartRate",
+      "fields": [
+        {
+          "fieldName": "vendor",
+          "owner": "HeartRate",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "vendor",
+          "comment": ""
+        },
+        {
+          "fieldName": "person_id",
+          "owner": "HeartRate",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "person_id (canonical, indexed RBAC key)",
+          "comment": ""
+        },
+        {
+          "fieldName": "person_name",
+          "owner": "HeartRate",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "person_name (from enrichment lookup)",
+          "comment": ""
+        },
+        {
+          "fieldName": "bpm",
+          "owner": "HeartRate",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "bpm",
+          "comment": ""
+        }
+      ],
+      "calculations": []
+    },
+    {
+      "objectName": "Activity",
+      "displayName": "Activity",
+      "parentName": "BaseEvent",
+      "comment": "Daily activity/summary. Backed once each vendor TA tags wearable_activity (Oura activity increment pending).",
+      "constraints": [
+        {
+          "search": "tag=wearable_activity"
+        }
+      ],
+      "lineage": "Activity",
+      "fields": [
+        {
+          "fieldName": "vendor",
+          "owner": "Activity",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "vendor",
+          "comment": ""
+        },
+        {
+          "fieldName": "person_id",
+          "owner": "Activity",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "person_id (canonical, indexed RBAC key)",
+          "comment": ""
+        },
+        {
+          "fieldName": "person_name",
+          "owner": "Activity",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "person_name (from enrichment lookup)",
+          "comment": ""
+        },
+        {
+          "fieldName": "day",
+          "owner": "Activity",
+          "type": "string",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "day",
+          "comment": ""
+        },
+        {
+          "fieldName": "steps",
+          "owner": "Activity",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "steps",
+          "comment": ""
+        },
+        {
+          "fieldName": "distance_m",
+          "owner": "Activity",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "distance_m",
+          "comment": ""
+        },
+        {
+          "fieldName": "active_calories",
+          "owner": "Activity",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "active_calories",
+          "comment": ""
+        },
+        {
+          "fieldName": "total_calories",
+          "owner": "Activity",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "total_calories",
+          "comment": ""
+        },
+        {
+          "fieldName": "active_min",
+          "owner": "Activity",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "active_min",
+          "comment": ""
+        },
+        {
+          "fieldName": "step_goal",
+          "owner": "Activity",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "step_goal",
+          "comment": ""
+        },
+        {
+          "fieldName": "distance_goal_m",
+          "owner": "Activity",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "distance_goal_m",
+          "comment": ""
+        },
+        {
+          "fieldName": "calorie_goal",
+          "owner": "Activity",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "calorie_goal",
+          "comment": ""
+        }
+      ],
+      "calculations": []
+    }
+  ]
+}

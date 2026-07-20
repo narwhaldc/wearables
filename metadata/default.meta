@@ -1,0 +1,18 @@
+## wearables app metadata.
+## Write is admin/sc_admin only (self-managed + Cloud). Read is broad, and the
+## data model is exported system-wide so dashboards (and any app) can use it.
+
+[]
+access = read : [ * ], write : [ admin, sc_admin ]
+
+## Export the Wearables data model globally.
+[datamodels]
+export = system
+
+[datamodels/Wearables]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+## Views/nav readable by all, editable by admin only.
+[views]
+export = system

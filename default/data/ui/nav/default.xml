@@ -1,0 +1,8 @@
+<nav search_view="search" color="#0F1117">
+  <view name="wearables_overview" default="true" label="Overview" icon="chartpanels"/>
+  <collection label="Explore" icon="magnifier">
+    <view name="search" label="Search"/>
+    <view name="datasets" label="Datasets"/>
+    <view name="reports" label="Reports"/>
+  </collection>
+</nav>
