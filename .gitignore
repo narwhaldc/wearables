@@ -3,3 +3,9 @@
 __pycache__/
 stage/
 dist/
+
+# editor swap/temp files (can contain secrets — never commit)
+*.swp
+*.swo
+.*.sw?
+*~
