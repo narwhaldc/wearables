@@ -1,11 +1,15 @@
 <form version="1.1" theme="dark">
   <label>Admin: Sample Data</label>
   <description>Create or delete synthetic (synthetic="true") wearable data for testing/demo. Admin-only (Create needs can_collect; Clean up needs can_delete). Pick an Action, set the options, and Submit — you'll be asked to approve the risky command (collect/delete) once per run.</description>
+  <init>
+    <set token="mode_create">1</set>
+  </init>
   <fieldset submitButton="true" autoRun="false">
     <input type="dropdown" token="action" searchWhenChanged="true">
       <label>Action</label>
       <choice value="create">Create sample data</choice>
       <choice value="cleanup">Clean up sample data</choice>
+      <default>create</default>
       <change>
         <condition value="create">
           <set token="mode_create">1</set>
