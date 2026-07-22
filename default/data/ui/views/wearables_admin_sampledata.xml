@@ -37,7 +37,7 @@
             <li>Each <b>Submit re-injects a batch</b> — clicking twice doubles the data. The nightly dedup search will collapse exact duplicates, or clean up manually below.</li>
             <li>Events appear within a few seconds of Submit (they go through indexing).</li>
           </ul>
-          <h3>Clean up (run in Search — set the time range to All time; <code>| delete</code> obeys the picker)</h3>
+          <h3>Clean up (run in Search — set the time range to All time so the search returns every synthetic event; <code>| delete</code> only removes what the search feeds it)</h3>
           <p><code>`widx` synthetic="true" | delete</code></p>
         </div>
       </html>
