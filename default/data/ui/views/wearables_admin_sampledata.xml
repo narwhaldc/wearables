@@ -1,0 +1,70 @@
+<form version="1.1" theme="dark">
+  <label>Admin: Generate Sample Data</label>
+  <description>Inject synthetic (synthetic="true") wearable events for a chosen person, replayed from the shipped wearable_samples.csv through the real TA normalization. Admin-only (requires can_collect). Choose a person + range and click Submit.</description>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="dropdown" token="sample_person" searchWhenChanged="false">
+      <label>Person</label>
+      <fieldForLabel>person_name</fieldForLabel>
+      <fieldForValue>person_id</fieldForValue>
+      <search>
+        <query>| inputlookup wearable_person_profile | table person_id person_name | sort person_id</query>
+      </search>
+    </input>
+    <input type="dropdown" token="sample_days" searchWhenChanged="false">
+      <label>Days of history</label>
+      <choice value="7">7 days</choice>
+      <choice value="14">14 days</choice>
+      <choice value="30">30 days</choice>
+      <choice value="60">60 days</choice>
+      <default>14</default>
+    </input>
+    <input type="dropdown" token="sample_vendor" searchWhenChanged="false">
+      <label>Vendor</label>
+      <choice value="sourcetype=*">All vendors</choice>
+      <choice value="sourcetype=oura:*">Oura only</choice>
+      <choice value="sourcetype=garmin:*">Garmin only</choice>
+      <default>sourcetype=*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <div style="padding:8px 4px; line-height:1.5">
+          <h3>What this does</h3>
+          <p>Replays the shipped <b>wearable_samples.csv</b> (one authentic-shaped event of every Oura and Garmin sourcetype) into <b>index=wearables</b> via <code>collect output_format=hec</code>, so the events pass through the same TA normalization the live fetchers feed. Each event is stamped <code>synthetic="true"</code> and the selected <code>person_id</code>, sprayed across the chosen number of days.</p>
+          <ul>
+            <li><b>Requires admin</b> (the <code>can_collect</code> capability).</li>
+            <li>Each <b>Submit re-injects a batch</b> — clicking twice doubles the data. The nightly dedup search will collapse exact duplicates, or clean up manually below.</li>
+            <li>Events appear within a few seconds of Submit (they go through indexing).</li>
+          </ul>
+          <h3>Clean up (run in Search — set the time range to All time; <code>| delete</code> obeys the picker)</h3>
+          <p><code>`widx` synthetic="true" | delete</code></p>
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row depends="$sample_person$">
+    <panel>
+      <title>Injected: person=$sample_person$ · $sample_days$ days · $sample_vendor$</title>
+      <table>
+        <search>
+          <query>| inputlookup wearable_samples.csv
+| search $sample_vendor$
+| eval day=mvrange(0,$sample_days$)
+| mvexpand day
+| eval _time=relative_time(now(),"-".day."d@d") + tonumber(offset_sec)
+| eval _raw=replace(_raw,"__PERSON__","$sample_person$")
+| eval _raw=replace(_raw,"__DAY__",strftime(_time,"%Y-%m-%d"))
+| fields _raw _time sourcetype
+| collect index=wearables output_format=hec
+| stats count as events by sourcetype
+| sort sourcetype</query>
+          <earliest>-1m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">30</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>
