@@ -45,6 +45,10 @@
       <choice value="sourcetype=garmin:*">Garmin only</choice>
       <default>sourcetype=*</default>
     </input>
+    <input type="dropdown" token="create_confirm" searchWhenChanged="false" depends="$mode_create$">
+      <label>Confirm create</label>
+      <choice value="yes">Yes — create synthetic events (I can delete them later via Clean up)</choice>
+    </input>
     <!-- CLEANUP inputs -->
     <input type="dropdown" token="cleanup_person" searchWhenChanged="false" depends="$mode_cleanup$">
       <label>Person (clean up)</label>
@@ -74,11 +78,12 @@
       <html>
         <div style="padding:8px 4px; line-height:1.5">
           <div style="border:2px solid #F4A422; background:rgba(244,164,34,0.12); border-radius:6px; padding:12px 14px; margin-bottom:14px; color:#F4A422; font-weight:600">
-            ⚠ After you click <b>Submit</b>, Splunk shows a small <b>"potential security risk"</b> dialog (it approves the <code>collect</code>/<code>delete</code> command). On the dark theme it's easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed. This is Splunk's built-in safeguard, expected for this tool.
+            ⚠ After you click <b>Submit</b>, Splunk shows a small <b>"potential security risk"</b> dialog (it approves the <code>collect</code>/<code>delete</code> command). On the dark theme it's easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed. This is Splunk's built-in safeguard, expected for this tool.<br/><br/>
+            <b>Don't worry</b> — nothing runs until you finish the pickers (including <b>Confirm</b>) and click <b>Submit</b>, so it's safe to look around. If you <b>Cancel</b> the dialog, that run is aborted (nothing was created or deleted) — just click <b>Submit</b> again and choose <b>"Run Query Anyway."</b>
           </div>
           <p>Pick an <b>Action</b> above. Only the selected action's options and result appear, and each action runs only on <b>Submit</b> — so a Create submit can never trigger a delete, and vice versa.</p>
           <ul>
-            <li><b>Create</b> replays the shipped <b>wearable_samples.csv</b> (one authentic-shaped event of every Oura + Garmin sourcetype) into <b>index=wearables</b> via <code>collect output_format=hec</code>, so events pass through the real TA normalization. Stamped <code>synthetic="true"</code> + the chosen <code>person_id</code>, sprayed across the day range. Each Submit adds a batch (re-submitting doubles it; nightly dedup collapses exact copies). Needs <b>can_collect</b>.</li>
+            <li><b>Create</b> replays the shipped <b>wearable_samples.csv</b> (one authentic-shaped event of every Oura + Garmin sourcetype) into <b>index=wearables</b> via <code>collect output_format=hec</code>, so events pass through the real TA normalization. Stamped <code>synthetic="true"</code> + the chosen <code>person_id</code>, sprayed across the day range. Each Submit adds a batch (re-submitting doubles it; nightly dedup collapses exact copies). Needs <b>can_collect</b>. Requires the explicit <b>Confirm create</b> selection.</li>
             <li><b>Clean up</b> deletes synthetic events for the chosen person + vendor scope (All = everything). It runs across <b>all time</b> automatically (no time-picker step), so nothing is left behind. Needs <b>can_delete</b>. Requires the explicit <b>Confirm delete</b> selection.</li>
             <li>Both are Splunk "risky commands" — after Submit, click the <b>⚠ icon</b> on the result panel to review + approve.</li>
           </ul>
@@ -87,7 +92,7 @@
     </panel>
   </row>
 
-  <row depends="$mode_create$ $sample_person$">
+  <row depends="$mode_create$ $sample_person$ $create_confirm$">
     <panel>
       <title>Created: person=$sample_person$ · $sample_days$ days · $sample_vendor$</title>
       <table>
