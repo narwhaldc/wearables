@@ -1,16 +1,32 @@
 <form version="1.1" theme="dark">
-  <label>Admin: Generate Sample Data</label>
-  <description>Inject synthetic (synthetic="true") wearable events for a chosen person, replayed from the shipped wearable_samples.csv through the real TA normalization. Admin-only (requires can_collect). Choose a person + range and click Submit.</description>
+  <label>Admin: Sample Data</label>
+  <description>Create or delete synthetic (synthetic="true") wearable data for testing/demo. Admin-only (Create needs can_collect; Clean up needs can_delete). Pick an Action, set the options, and Submit — you'll be asked to approve the risky command (collect/delete) once per run.</description>
   <fieldset submitButton="true" autoRun="false">
-    <input type="dropdown" token="sample_person" searchWhenChanged="false">
-      <label>Person</label>
+    <input type="dropdown" token="action" searchWhenChanged="true">
+      <label>Action</label>
+      <choice value="create">Create sample data</choice>
+      <choice value="cleanup">Clean up sample data</choice>
+      <change>
+        <condition value="create">
+          <set token="mode_create">1</set>
+          <unset token="mode_cleanup"></unset>
+        </condition>
+        <condition value="cleanup">
+          <set token="mode_cleanup">1</set>
+          <unset token="mode_create"></unset>
+        </condition>
+      </change>
+    </input>
+    <!-- CREATE inputs -->
+    <input type="dropdown" token="sample_person" searchWhenChanged="false" depends="$mode_create$">
+      <label>Person (create)</label>
       <fieldForLabel>person_name</fieldForLabel>
       <fieldForValue>person_id</fieldForValue>
       <search>
         <query>| inputlookup wearable_person_profile | table person_id person_name | sort person_id</query>
       </search>
     </input>
-    <input type="dropdown" token="sample_days" searchWhenChanged="false">
+    <input type="dropdown" token="sample_days" searchWhenChanged="false" depends="$mode_create$">
       <label>Days of history</label>
       <choice value="7">7 days</choice>
       <choice value="14">14 days</choice>
@@ -18,34 +34,55 @@
       <choice value="60">60 days</choice>
       <default>14</default>
     </input>
-    <input type="dropdown" token="sample_vendor" searchWhenChanged="false">
-      <label>Vendor</label>
+    <input type="dropdown" token="sample_vendor" searchWhenChanged="false" depends="$mode_create$">
+      <label>Vendor (create)</label>
       <choice value="sourcetype=*">All vendors</choice>
       <choice value="sourcetype=oura:*">Oura only</choice>
       <choice value="sourcetype=garmin:*">Garmin only</choice>
       <default>sourcetype=*</default>
     </input>
+    <!-- CLEANUP inputs -->
+    <input type="dropdown" token="cleanup_person" searchWhenChanged="false" depends="$mode_cleanup$">
+      <label>Person (clean up)</label>
+      <choice value="*">All people</choice>
+      <fieldForLabel>person_name</fieldForLabel>
+      <fieldForValue>person_id</fieldForValue>
+      <search>
+        <query>| inputlookup wearable_person_profile | table person_id person_name | sort person_id</query>
+      </search>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="cleanup_vendor" searchWhenChanged="false" depends="$mode_cleanup$">
+      <label>Vendor (clean up)</label>
+      <choice value="*">All vendors</choice>
+      <choice value="oura">Oura only</choice>
+      <choice value="garmin">Garmin only</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="cleanup_confirm" searchWhenChanged="false" depends="$mode_cleanup$">
+      <label>Confirm delete</label>
+      <choice value="yes">Yes — permanently delete the matching synthetic events</choice>
+    </input>
   </fieldset>
+
   <row>
     <panel>
       <html>
         <div style="padding:8px 4px; line-height:1.5">
-          <h3>What this does</h3>
-          <p>Replays the shipped <b>wearable_samples.csv</b> (one authentic-shaped event of every Oura and Garmin sourcetype) into <b>index=wearables</b> via <code>collect output_format=hec</code>, so the events pass through the same TA normalization the live fetchers feed. Each event is stamped <code>synthetic="true"</code> and the selected <code>person_id</code>, sprayed across the chosen number of days.</p>
+          <p>Pick an <b>Action</b> above. Only the selected action's options and result appear, and each action runs only on <b>Submit</b> — so a Create submit can never trigger a delete, and vice versa.</p>
           <ul>
-            <li><b>Requires admin</b> (the <code>can_collect</code> capability).</li>
-            <li>Each <b>Submit re-injects a batch</b> — clicking twice doubles the data. The nightly dedup search will collapse exact duplicates, or clean up manually below.</li>
-            <li>Events appear within a few seconds of Submit (they go through indexing).</li>
+            <li><b>Create</b> replays the shipped <b>wearable_samples.csv</b> (one authentic-shaped event of every Oura + Garmin sourcetype) into <b>index=wearables</b> via <code>collect output_format=hec</code>, so events pass through the real TA normalization. Stamped <code>synthetic="true"</code> + the chosen <code>person_id</code>, sprayed across the day range. Each Submit adds a batch (re-submitting doubles it; nightly dedup collapses exact copies). Needs <b>can_collect</b>.</li>
+            <li><b>Clean up</b> deletes synthetic events for the chosen person + vendor scope (All = everything). It runs across <b>all time</b> automatically (no time-picker step), so nothing is left behind. Needs <b>can_delete</b>. Requires the explicit <b>Confirm delete</b> selection.</li>
+            <li>Both are Splunk "risky commands" — after Submit, click the <b>⚠ icon</b> on the result panel to review + approve.</li>
           </ul>
-          <h3>Clean up (run in Search — set the time range to All time so the search returns every synthetic event; <code>| delete</code> only removes what the search feeds it)</h3>
-          <p><code>`widx` synthetic="true" | delete</code></p>
         </div>
       </html>
     </panel>
   </row>
-  <row depends="$sample_person$">
+
+  <row depends="$mode_create$ $sample_person$">
     <panel>
-      <title>Injected: person=$sample_person$ · $sample_days$ days · $sample_vendor$</title>
+      <title>Created: person=$sample_person$ · $sample_days$ days · $sample_vendor$</title>
       <table>
         <search>
           <query>| inputlookup wearable_samples.csv
@@ -63,6 +100,22 @@
           <latest>now</latest>
         </search>
         <option name="count">30</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <row depends="$mode_cleanup$ $cleanup_confirm$">
+    <panel>
+      <title>Deleted synthetic: person=$cleanup_person$ · vendor=$cleanup_vendor$ (all time)</title>
+      <table>
+        <search>
+          <query>`widx` synthetic="true" person_id="$cleanup_person$" vendor="$cleanup_vendor$"
+| delete
+| stats sum(deleted) as records_deleted, sum(errors) as errors</query>
+          <earliest>0</earliest>
+          <latest>now</latest>
+        </search>
         <option name="drilldown">none</option>
       </table>
     </panel>
