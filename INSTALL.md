@@ -5,8 +5,9 @@ model, fed by per-vendor add-ons. This is the **platform** guide; each vendor's 
 in that add-on's own INSTALL:
 - Oura ingest → **[TA-oura/INSTALL.md](https://github.com/narwhaldc/TA-oura/blob/main/INSTALL.md)**
 - Garmin ingest → **[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**
+- Withings ingest → **[TA-withings/INSTALL.md](https://github.com/narwhaldc/TA-withings/blob/main/INSTALL.md)**
 
-**App version:** wearables 0.1.47 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.1.48 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -29,10 +30,11 @@ in that add-on's own INSTALL:
 ```
 Oura Ring ─▶ TA-oura/tools/oura_to_hec_with_phi.py  (pull, OAuth2)
 Garmin    ─▶ TA-garmin/tools/garmin_to_hec.py       (pull, python-garminconnect)
+Withings  ─▶ TA-withings/tools/withings_to_hec.py   (pull, OAuth2)
                          │  HEC: index=wearables, sourcetype=<vendor>:<type>,
                          │       indexed fields vendor + person_id
                          ▼
-        TA-oura / TA-garmin  ── search-time normalization ──▶ canonical fields + tags
+        TA-oura / TA-garmin / TA-withings  ── search-time normalization ──▶ canonical fields + tags
                          ▼
         wearables  ── data model (Sleep/HeartRate/Activity/Workout/Daily/Device) + 6 dashboards
                          ▼
@@ -47,6 +49,7 @@ internet-facing. Ingest scripts are **repo-only** (never shipped in a `.spl` —
 | **wearables** app (model + dashboards + KV registries) | [narwhaldc/wearables](https://github.com/narwhaldc/wearables) | yes |
 | **TA-oura** (Oura normalize + `tools/` fetcher) | [narwhaldc/TA-oura](https://github.com/narwhaldc/TA-oura) | app yes, `tools/` no |
 | **TA-garmin** (Garmin normalize + `tools/` poller) | [narwhaldc/TA-garmin](https://github.com/narwhaldc/TA-garmin) | app yes, `tools/` no |
+| **TA-withings** (Withings normalize + `tools/` fetcher) | [narwhaldc/TA-withings](https://github.com/narwhaldc/TA-withings) | app yes, `tools/` no |
 | **hypnogram_viz** (custom viz) | [narwhaldc/hypnogram_viz](https://github.com/narwhaldc/hypnogram_viz) | yes |
 | **charge_ring_viz** (custom viz) | [narwhaldc/charge_ring_viz](https://github.com/narwhaldc/charge_ring_viz) | yes |
 
@@ -75,7 +78,7 @@ internet-facing. Ingest scripts are **repo-only** (never shipped in a `.spl` —
 
 ## 2. Install the apps
 Install (Apps → Install app from file) and **restart Splunk** so custom-viz JS + the data model load:
-1. **TA-oura** and/or **TA-garmin** (normalization the model constrains on).
+1. **TA-oura**, **TA-garmin**, and/or **TA-withings** (normalization the model constrains on).
 2. **wearables** (data model + dashboards + KV registries).
 3. **hypnogram_viz** + **charge_ring_viz** (hypnogram + charge panels).
 
@@ -83,6 +86,7 @@ Install (Apps → Install app from file) and **restart Splunk** so custom-viz JS
 Copy the vendor's script from its add-on `tools/` to your ingest host and follow that add-on's INSTALL:
 - **Oura:** `oura_to_hec_with_phi.py` — OAuth2 `--auth`, `oura_targets.json`. See **TA-oura/INSTALL.md**.
 - **Garmin:** `garmin_to_hec.py` — one-time `garmin_probe.py` login, `garmin_targets.json`. See **TA-garmin/INSTALL.md**.
+- **Withings:** `withings_to_hec.py` — OAuth2 `--auth`, `withings_targets.json`. See **TA-withings/INSTALL.md**.
 
 Both point HEC at `index=wearables` and stamp indexed `vendor` + `person_id`. Targets files hold
 tokens → **gitignored, never commit** (both add-ons enforce this).

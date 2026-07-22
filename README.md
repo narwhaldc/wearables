@@ -1,12 +1,13 @@
 # Wearables Health — Splunk app (vendor-neutral wearables dashboards)
 
 Dashboards over the **Wearables data model** — one panel set that works across devices
-(**Oura** today; **Garmin** next). The hub of the multi-vendor platform; the single-vendor
+(**Oura**, **Garmin**, and **Withings**). The hub of the multi-vendor platform; the single-vendor
 **oura_health** app remains the GA fallback and is superseded by this app over time.
 
 Quick start + all repo links are on the in-app **Overview** page. Per-vendor ingest setup:
 **[TA-oura/INSTALL.md](https://github.com/narwhaldc/TA-oura/blob/main/INSTALL.md)** ·
-**[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**.
+**[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)** ·
+**[TA-withings/INSTALL.md](https://github.com/narwhaldc/TA-withings/blob/main/INSTALL.md)**.
 
 ## Contents
 - `default/data/models/Wearables.json` — the **Wearables data model**: event-based roots
@@ -25,7 +26,7 @@ Quick start + all repo links are on the in-app **Overview** page. Per-vendor ing
 ## Requirements
 - **`index=wearables`** (Settings → Indexes / ACS).
 - A vendor add-on installed: **[TA-oura](https://github.com/narwhaldc/TA-oura)** and/or
-  **[TA-garmin](https://github.com/narwhaldc/TA-garmin)** — they ingest + normalize into the model.
+  **[TA-garmin](https://github.com/narwhaldc/TA-garmin)**, and/or **[TA-withings](https://github.com/narwhaldc/TA-withings)** — they ingest + normalize into the model.
   Ingest scripts live in each add-on's `tools/` (repo-only, never shipped in the `.spl`).
 - Per-person **RBAC** via role `srchFilter` on the indexed `person_id` (see `RBAC.md`).
 - Custom-viz add-ons **hypnogram_viz** + **charge_ring_viz** for the hypnogram / charge panels.
