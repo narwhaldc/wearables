@@ -46,3 +46,6 @@ export = system
 [collections/wearable_device_profile]
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
+
+[macros]
+export = system
