@@ -6,7 +6,7 @@ in that add-on's own INSTALL:
 - Oura ingest → **[TA-oura/INSTALL.md](https://github.com/narwhaldc/TA-oura/blob/main/INSTALL.md)**
 - Garmin ingest → **[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**
 
-**App version:** wearables 0.1.46 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.1.47 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
