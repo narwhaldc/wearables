@@ -6,7 +6,7 @@ in that add-on's own INSTALL:
 - Oura ingest → **[TA-oura/INSTALL.md](https://github.com/narwhaldc/TA-oura/blob/main/INSTALL.md)**
 - Garmin ingest → **[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**
 
-**App version:** wearables 0.1.30 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.1.31 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -60,6 +60,14 @@ internet-facing. Ingest scripts are **repo-only** (never shipped in a `.spl` —
 
 ## 1. Create index=wearables + HEC
 - **Index:** Settings → Indexes → New Index → `wearables` (Events). On Cloud, use the console/ACS.
+  **The recommended index name is `wearables`.**
+  > **Using a different index?** The dashboards read their index through the **`widx` macro**
+  > (Settings → Advanced Search → Search macros → `widx`, in this app), defined as
+  > `index=wearables`. Point the whole app at another index by editing that **one macro line** —
+  > no dashboard edits needed. The `widx` index **must match the ingest target index** you set in
+  > the TA (see the TA INSTALLs' targets config), and the `oura_health` app has its own `widx`
+  > (a bridge `(index=oura OR index=wearables)`) to update to match too. The dedup-maintenance /
+  > registry-backup saved searches use the literal index name — update those if you rename.
 - **HEC:** Settings → Data Inputs → HTTP Event Collector → enable + note the port (default 8088);
   create a token with access to `index=wearables`. The `hec_url` is
   `<http|https>://<host>:8088/services/collector/event` (scheme must match HEC's SSL setting; on
