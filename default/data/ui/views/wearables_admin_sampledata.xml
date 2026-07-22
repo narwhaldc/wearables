@@ -39,6 +39,7 @@
       <choice value="sourcetype=*">All vendors</choice>
       <choice value="sourcetype=oura:*">Oura only</choice>
       <choice value="sourcetype=garmin:*">Garmin only</choice>
+      <choice value="sourcetype=withings:*">Withings only</choice>
     </input>
     <input type="dropdown" token="create_confirm" searchWhenChanged="false" depends="$mode_create$">
       <label>Confirm create</label>
@@ -59,6 +60,7 @@
       <choice value="*">All vendors</choice>
       <choice value="oura">Oura only</choice>
       <choice value="garmin">Garmin only</choice>
+      <choice value="withings">Withings only</choice>
     </input>
     <input type="dropdown" token="cleanup_confirm" searchWhenChanged="false" depends="$mode_cleanup$">
       <label>Confirm delete</label>
