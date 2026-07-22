@@ -69,6 +69,9 @@
     <panel>
       <html>
         <div style="padding:8px 4px; line-height:1.5">
+          <div style="border:2px solid #F4A422; background:rgba(244,164,34,0.12); border-radius:6px; padding:12px 14px; margin-bottom:14px; color:#F4A422; font-weight:600">
+            ⚠ After you click <b>Submit</b>, Splunk shows a small <b>"potential security risk"</b> dialog (it approves the <code>collect</code>/<code>delete</code> command). On the dark theme it's easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed. This is Splunk's built-in safeguard, expected for this tool.
+          </div>
           <p>Pick an <b>Action</b> above. Only the selected action's options and result appear, and each action runs only on <b>Submit</b> — so a Create submit can never trigger a delete, and vice versa.</p>
           <ul>
             <li><b>Create</b> replays the shipped <b>wearable_samples.csv</b> (one authentic-shaped event of every Oura + Garmin sourcetype) into <b>index=wearables</b> via <code>collect output_format=hec</code>, so events pass through the real TA normalization. Stamped <code>synthetic="true"</code> + the chosen <code>person_id</code>, sprayed across the day range. Each Submit adds a batch (re-submitting doubles it; nightly dedup collapses exact copies). Needs <b>can_collect</b>.</li>
