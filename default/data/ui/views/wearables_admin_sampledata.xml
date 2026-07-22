@@ -1,15 +1,11 @@
 <form version="1.1" theme="dark">
   <label>Admin: Sample Data</label>
   <description>Create or delete synthetic (synthetic="true") wearable data for testing/demo. Admin-only (Create needs can_collect; Clean up needs can_delete). Pick an Action, set the options, and Submit — you'll be asked to approve the risky command (collect/delete) once per run.</description>
-  <init>
-    <set token="mode_create">1</set>
-  </init>
   <fieldset submitButton="true" autoRun="false">
     <input type="dropdown" token="action" searchWhenChanged="true">
       <label>Action</label>
       <choice value="create">Create sample data</choice>
       <choice value="cleanup">Clean up sample data</choice>
-      <default>create</default>
       <change>
         <condition value="create">
           <set token="mode_create">1</set>
@@ -43,7 +39,6 @@
       <choice value="sourcetype=*">All vendors</choice>
       <choice value="sourcetype=oura:*">Oura only</choice>
       <choice value="sourcetype=garmin:*">Garmin only</choice>
-      <default>sourcetype=*</default>
     </input>
     <input type="dropdown" token="create_confirm" searchWhenChanged="false" depends="$mode_create$">
       <label>Confirm create</label>
@@ -58,14 +53,12 @@
       <search>
         <query>| inputlookup wearable_person_profile | table person_id person_name | sort person_id</query>
       </search>
-      <default>*</default>
     </input>
     <input type="dropdown" token="cleanup_vendor" searchWhenChanged="false" depends="$mode_cleanup$">
       <label>Vendor (clean up)</label>
       <choice value="*">All vendors</choice>
       <choice value="oura">Oura only</choice>
       <choice value="garmin">Garmin only</choice>
-      <default>*</default>
     </input>
     <input type="dropdown" token="cleanup_confirm" searchWhenChanged="false" depends="$mode_cleanup$">
       <label>Confirm delete</label>
@@ -92,7 +85,7 @@
     </panel>
   </row>
 
-  <row depends="$mode_create$ $sample_person$ $create_confirm$">
+  <row depends="$mode_create$ $sample_person$ $sample_vendor$ $create_confirm$">
     <panel>
       <title>Created: person=$sample_person$ · $sample_days$ days · $sample_vendor$</title>
       <table>
@@ -117,7 +110,7 @@
     </panel>
   </row>
 
-  <row depends="$mode_cleanup$ $cleanup_confirm$">
+  <row depends="$mode_cleanup$ $cleanup_person$ $cleanup_vendor$ $cleanup_confirm$">
     <panel>
       <title>Deleted synthetic: person=$cleanup_person$ · vendor=$cleanup_vendor$ (all time)</title>
       <table>
