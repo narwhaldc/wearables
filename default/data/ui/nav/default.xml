@@ -5,11 +5,14 @@
   <view name="wearables_activity" label="Activity" icon="running"/>
   <view name="wearables_wellness" label="Wellness" icon="heart"/>
   <view name="wearables_device" label="Device" icon="gear"/>
-  <view name="wearables_overview" label="Overview" icon="bookmark"/>
   <collection label="Explore" icon="magnifier">
     <view name="search" label="Search"/>
     <view name="datasets" label="Datasets"/>
     <view name="reports" label="Reports"/>
   </collection>
-  <view name="wearables_admin_sampledata" label="Admin" icon="gear"/>
+  <collection label="Admin" icon="gear">
+    <view name="wearables_admin_people" label="People &amp; Defaults"/>
+    <view name="wearables_admin_sampledata" label="Sample Data"/>
+    <view name="wearables_overview" label="About"/>
+  </collection>
 </nav>

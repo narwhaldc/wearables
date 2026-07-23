@@ -1,0 +1,167 @@
+<form version="1.1" theme="dark">
+  <label>Admin: People &amp; Defaults</label>
+  <description>Add or edit a person's registry row — display name, per-person default units + goals, height — and map a Splunk login to a person_id (the identity map). Admin-only: writes go to the wearable_person_profile KV Store (locked to admin/sc_admin) via the risky-command (outputlookup) approve dialog.</description>
+  <init>
+    <set token="p_id"></set>
+    <set token="p_user"></set>
+    <set token="p_name"></set>
+    <set token="p_units"></set>
+    <set token="p_step"></set>
+    <set token="p_cal"></set>
+    <set token="p_dist"></set>
+    <set token="p_height"></set>
+    <set token="r_id"></set>
+    <set token="mode_manage">1</set>
+  </init>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="dropdown" token="paction" searchWhenChanged="true">
+      <label>Action</label>
+      <choice value="manage">Add / Edit a person</choice>
+      <choice value="remove">Remove a person</choice>
+      <default>manage</default>
+      <change>
+        <condition value="manage">
+          <set token="mode_manage">1</set>
+          <unset token="mode_remove"></unset>
+        </condition>
+        <condition value="remove">
+          <set token="mode_remove">1</set>
+          <unset token="mode_manage"></unset>
+        </condition>
+      </change>
+    </input>
+    <!-- ADD / EDIT inputs -->
+    <input type="text" token="p_id" searchWhenChanged="false" depends="$mode_manage$">
+      <label>person_id — new = add, existing = edit</label>
+    </input>
+    <input type="text" token="p_user" searchWhenChanged="false" depends="$mode_manage$">
+      <label>Splunk username (identity map · blank = keep)</label>
+    </input>
+    <input type="text" token="p_name" searchWhenChanged="false" depends="$mode_manage$">
+      <label>Display name (blank = keep)</label>
+    </input>
+    <input type="dropdown" token="p_units" searchWhenChanged="false" depends="$mode_manage$">
+      <label>Default units</label>
+      <choice value="">(leave unchanged)</choice>
+      <choice value="metric">metric</choice>
+      <choice value="imperial">imperial</choice>
+      <default></default>
+    </input>
+    <input type="text" token="p_step" searchWhenChanged="false" depends="$mode_manage$">
+      <label>Step goal (blank = keep)</label>
+    </input>
+    <input type="text" token="p_cal" searchWhenChanged="false" depends="$mode_manage$">
+      <label>Calorie goal (blank = keep)</label>
+    </input>
+    <input type="text" token="p_dist" searchWhenChanged="false" depends="$mode_manage$">
+      <label>Distance goal, meters (blank = keep)</label>
+    </input>
+    <input type="text" token="p_height" searchWhenChanged="false" depends="$mode_manage$">
+      <label>Height, cm (blank = keep)</label>
+    </input>
+    <input type="dropdown" token="manage_confirm" searchWhenChanged="false" depends="$mode_manage$">
+      <label>Confirm write</label>
+      <choice value="yes">Yes — write this person to the registry</choice>
+    </input>
+    <!-- REMOVE inputs -->
+    <input type="dropdown" token="r_id" searchWhenChanged="false" depends="$mode_remove$">
+      <label>Person to remove</label>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>person_id</fieldForValue>
+      <search>
+        <query>| inputlookup wearable_person_profile
+| eval label=person_id." — ".coalesce(person_name, person_id)
+| sort person_id
+| table person_id label</query>
+      </search>
+    </input>
+    <input type="dropdown" token="remove_confirm" searchWhenChanged="false" depends="$mode_remove$">
+      <label>Confirm remove</label>
+      <choice value="yes">Yes — permanently remove this person's registry row</choice>
+    </input>
+  </fieldset>
+
+  <row>
+    <panel>
+      <html>
+        <div style="padding:8px 4px; line-height:1.5">
+          <div style="border:2px solid #F4A422; background:rgba(244,164,34,0.12); border-radius:6px; padding:12px 14px; margin-bottom:14px; color:#F4A422; font-weight:600">
+            ⚠ After you click <b>Submit</b>, Splunk shows a small <b>"potential security risk"</b> dialog (it approves the <code>outputlookup</code> command). On the dark theme it's easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed. Nothing is written until you finish the fields (including <b>Confirm</b>), click <b>Submit</b>, and approve.
+          </div>
+          <p>This page maintains the <b>wearable_person_profile</b> registry (KV Store) — the human layer over the opaque, RBAC-gated <code>person_id</code>. Writes are locked to <b>admin/sc_admin</b>; a non-admin who reaches this page can view the roster but any write returns a permission error.</p>
+          <ul>
+            <li><b>Add / Edit</b> — type the <code>person_id</code>. A <b>new</b> id creates the row; an <b>existing</b> id edits it. Every field left <b>blank keeps its current value</b> (read-modify-write), so you only fill what you want to change.</li>
+            <li><b>Splunk username</b> is the <b>identity map</b> (<code>$env:user$</code> → person_id) — the groundwork for the self-service profile page and for the dashboards to auto-select the logged-in user + their default units.</li>
+            <li><b>Default units</b> / <b>goals</b> / <b>height</b> are the per-person display defaults the dashboards read.</li>
+            <li><b>Remove</b> deletes a person's registry row (does <b>not</b> delete their indexed data — use <b>Admin: Sample Data → Clean up</b> for synthetic events).</li>
+            <li>To seed a brand-new person's demo data after adding them here, use <b>Admin: Sample Data → Create</b>.</li>
+          </ul>
+        </div>
+      </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Current roster — wearable_person_profile</title>
+      <table>
+        <search>
+          <query>| inputlookup wearable_person_profile
+| eval person_name=coalesce(person_name, person_id)
+| sort person_id
+| table person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm</query>
+        </search>
+        <option name="count">50</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <row depends="$mode_manage$ $manage_confirm$">
+    <panel>
+      <title>Wrote person = $p_id$</title>
+      <table>
+        <search>
+          <query>| inputlookup wearable_person_profile where person_id="$p_id$"
+| appendpipe
+    [| stats count
+    | where count==0
+    | eval person_id="$p_id$"]
+| eval splunk_user     = if("$p_user$"!="",   "$p_user$",   splunk_user)
+| eval person_name     = if("$p_name$"!="",   "$p_name$",   person_name)
+| eval units           = if("$p_units$"!="",  "$p_units$",  units)
+| eval step_goal       = if("$p_step$"!="",   tonumber("$p_step$"),   step_goal)
+| eval calorie_goal    = if("$p_cal$"!="",    tonumber("$p_cal$"),    calorie_goal)
+| eval distance_goal_m = if("$p_dist$"!="",   tonumber("$p_dist$"),   distance_goal_m)
+| eval height_cm       = if("$p_height$"!="", tonumber("$p_height$"), height_cm)
+| eval person_id=coalesce(person_id,"$p_id$")
+| where person_id!=""
+| table _key person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm
+| outputlookup append=t wearable_person_profile
+| eval status="written"
+| table status person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm</query>
+          <earliest>-1m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <row depends="$mode_remove$ $remove_confirm$">
+    <panel>
+      <title>Removed person = $r_id$</title>
+      <table>
+        <search>
+          <query>| inputlookup wearable_person_profile
+| where person_id!="$r_id$"
+| outputlookup wearable_person_profile
+| stats count as rows_remaining</query>
+          <earliest>-1m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>
