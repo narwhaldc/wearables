@@ -130,10 +130,10 @@
 | eval splunk_user     = if("$p_user$"!="",   "$p_user$",   splunk_user)
 | eval person_name     = if("$p_name$"!="",   "$p_name$",   person_name)
 | eval units           = if("$p_units$"!="",  "$p_units$",  units)
-| eval step_goal       = if("$p_step$"!="",   tonumber("$p_step$"),   step_goal)
-| eval calorie_goal    = if("$p_cal$"!="",    tonumber("$p_cal$"),    calorie_goal)
-| eval distance_goal_m = if("$p_dist$"!="",   tonumber("$p_dist$"),   distance_goal_m)
-| eval height_cm       = if("$p_height$"!="", tonumber("$p_height$"), height_cm)
+| eval step_goal       = coalesce(tonumber(if("$p_step$"=="",   null(), "$p_step$")),   step_goal)
+| eval calorie_goal    = coalesce(tonumber(if("$p_cal$"=="",    null(), "$p_cal$")),    calorie_goal)
+| eval distance_goal_m = coalesce(tonumber(if("$p_dist$"=="",   null(), "$p_dist$")),   distance_goal_m)
+| eval height_cm       = coalesce(tonumber(if("$p_height$"=="", null(), "$p_height$")), height_cm)
 | eval person_id=coalesce(person_id,"$p_id$")
 | where person_id!=""
 | join type=left splunk_user
