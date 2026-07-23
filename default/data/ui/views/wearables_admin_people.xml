@@ -20,6 +20,7 @@
     <set token="sel_p_height"></set>
     <set token="r_id"></set>
     <set token="mode_manage">1</set>
+    <set token="roster_refresh"></set>
   </init>
   <fieldset submitButton="true" autoRun="false">
     <input type="dropdown" token="paction" searchWhenChanged="true">
@@ -121,7 +122,7 @@
       <title>Current roster — click a row to load it into the Add / Edit form above</title>
       <table>
         <search>
-          <query>| inputlookup wearable_person_profile
+          <query>| inputlookup wearable_person_profile ```refresh:$roster_refresh$```
 | sort person_id
 | table person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm</query>
         </search>
@@ -181,6 +182,9 @@
 | table outcome person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm</query>
           <earliest>-1m</earliest>
           <latest>now</latest>
+          <done>
+            <set token="roster_refresh">$job.sid$</set>
+          </done>
         </search>
         <option name="drilldown">none</option>
       </table>
@@ -198,6 +202,9 @@
 | stats count as rows_remaining</query>
           <earliest>-1m</earliest>
           <latest>now</latest>
+          <done>
+            <set token="roster_refresh">$job.sid$</set>
+          </done>
         </search>
         <option name="drilldown">none</option>
       </table>
