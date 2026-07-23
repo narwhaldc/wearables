@@ -130,10 +130,14 @@
 | eval splunk_user     = if("$p_user$"!="",   "$p_user$",   splunk_user)
 | eval person_name     = if("$p_name$"!="",   "$p_name$",   person_name)
 | eval units           = if("$p_units$"!="",  "$p_units$",  units)
-| eval step_goal       = coalesce(tonumber(if("$p_step$"=="",   null(), "$p_step$")),   step_goal)
-| eval calorie_goal    = coalesce(tonumber(if("$p_cal$"=="",    null(), "$p_cal$")),    calorie_goal)
-| eval distance_goal_m = coalesce(tonumber(if("$p_dist$"=="",   null(), "$p_dist$")),   distance_goal_m)
-| eval height_cm       = coalesce(tonumber(if("$p_height$"=="", null(), "$p_height$")), height_cm)
+| eval _step   = if("$p_step$"=="",   "0", "$p_step$")
+| eval _cal    = if("$p_cal$"=="",    "0", "$p_cal$")
+| eval _dist   = if("$p_dist$"=="",   "0", "$p_dist$")
+| eval _height = if("$p_height$"=="", "0", "$p_height$")
+| eval step_goal       = if("$p_step$"=="",   step_goal,       tonumber(_step))
+| eval calorie_goal    = if("$p_cal$"=="",    calorie_goal,    tonumber(_cal))
+| eval distance_goal_m = if("$p_dist$"=="",   distance_goal_m, tonumber(_dist))
+| eval height_cm       = if("$p_height$"=="", height_cm,       tonumber(_height))
 | eval person_id=coalesce(person_id,"$p_id$")
 | where person_id!=""
 | join type=left splunk_user
