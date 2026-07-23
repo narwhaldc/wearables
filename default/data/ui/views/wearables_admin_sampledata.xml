@@ -23,7 +23,13 @@
       <fieldForLabel>person_name</fieldForLabel>
       <fieldForValue>person_id</fieldForValue>
       <search>
-        <query>| inputlookup wearable_person_profile | table person_id person_name | sort person_id</query>
+        <query>| tstats count where `widx` by person_id
+| lookup wearable_person_profile person_id OUTPUT person_name
+| eval person_name=coalesce(person_name, person_id)
+| sort person_name
+| table person_id person_name</query>
+        <earliest>0</earliest>
+        <latest>now</latest>
       </search>
     </input>
     <input type="dropdown" token="sample_days" searchWhenChanged="false" depends="$mode_create$">
@@ -52,7 +58,13 @@
       <fieldForLabel>person_name</fieldForLabel>
       <fieldForValue>person_id</fieldForValue>
       <search>
-        <query>| inputlookup wearable_person_profile | table person_id person_name | sort person_id</query>
+        <query>| tstats count where `widx` by person_id
+| lookup wearable_person_profile person_id OUTPUT person_name
+| eval person_name=coalesce(person_name, person_id)
+| sort person_name
+| table person_id person_name</query>
+        <earliest>0</earliest>
+        <latest>now</latest>
       </search>
     </input>
     <input type="dropdown" token="cleanup_vendor" searchWhenChanged="false" depends="$mode_cleanup$">
