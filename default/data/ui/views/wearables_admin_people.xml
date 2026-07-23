@@ -123,6 +123,7 @@
       <table>
         <search>
           <query>| inputlookup wearable_person_profile ```refresh:$roster_refresh$```
+| fillnull value="" splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm
 | sort person_id
 | table person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm</query>
         </search>
@@ -158,17 +159,20 @@
     | where count==0
     | eval person_id=upper("$p_id$")]
 | eval person_id=upper("$p_id$")
-| eval splunk_user     = if("$p_user$"!="",   "$p_user$",   splunk_user)
-| eval person_name     = if("$p_name$"!="",   "$p_name$",   person_name)
-| eval units           = if("$p_units$"!="",  "$p_units$",  units)
-| eval _step   = if("$p_step$"=="",   "0", "$p_step$")
-| eval _cal    = if("$p_cal$"=="",    "0", "$p_cal$")
-| eval _dist   = if("$p_dist$"=="",   "0", "$p_dist$")
-| eval _height = if("$p_height$"=="", "0", "$p_height$")
-| eval step_goal       = if("$p_step$"=="",   step_goal,       tonumber(_step))
-| eval calorie_goal    = if("$p_cal$"=="",    calorie_goal,    tonumber(_cal))
-| eval distance_goal_m = if("$p_dist$"=="",   distance_goal_m, tonumber(_dist))
-| eval height_cm       = if("$p_height$"=="", height_cm,       tonumber(_height))
+| eval _u  = if("$p_user$"=="null",   "", "$p_user$")
+| eval _nm = if("$p_name$"=="null",   "", "$p_name$")
+| eval _un = if("$p_units$"=="null",  "", "$p_units$")
+| eval _sg = if("$p_step$"=="null",   "", "$p_step$")
+| eval _cg = if("$p_cal$"=="null",    "", "$p_cal$")
+| eval _dg = if("$p_dist$"=="null",   "", "$p_dist$")
+| eval _hg = if("$p_height$"=="null", "", "$p_height$")
+| eval splunk_user     = if(_u!="",  _u,  splunk_user)
+| eval person_name     = if(_nm!="", _nm, person_name)
+| eval units           = if(_un!="", _un, units)
+| eval step_goal       = if(_sg=="", step_goal,       tonumber(if(_sg=="","0",_sg)))
+| eval calorie_goal    = if(_cg=="", calorie_goal,    tonumber(if(_cg=="","0",_cg)))
+| eval distance_goal_m = if(_dg=="", distance_goal_m, tonumber(if(_dg=="","0",_dg)))
+| eval height_cm       = if(_hg=="", height_cm,       tonumber(if(_hg=="","0",_hg)))
 | where person_id!=""
 | lookup wearable_person_profile splunk_user AS splunk_user OUTPUT person_id AS owner
 | eval owner=mvindex(owner,0)
