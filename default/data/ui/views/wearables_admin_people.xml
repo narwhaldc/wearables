@@ -10,6 +10,14 @@
     <set token="p_cal"></set>
     <set token="p_dist"></set>
     <set token="p_height"></set>
+    <set token="sel_p_id"></set>
+    <set token="sel_p_user"></set>
+    <set token="sel_p_name"></set>
+    <set token="sel_p_units"></set>
+    <set token="sel_p_step"></set>
+    <set token="sel_p_cal"></set>
+    <set token="sel_p_dist"></set>
+    <set token="sel_p_height"></set>
     <set token="r_id"></set>
     <set token="mode_manage">1</set>
   </init>
@@ -33,31 +41,38 @@
     <!-- ADD / EDIT inputs -->
     <input type="text" token="p_id" searchWhenChanged="false" depends="$mode_manage$">
       <label>person_id — new = add, existing = edit</label>
+      <default>$sel_p_id$</default>
     </input>
     <input type="text" token="p_user" searchWhenChanged="false" depends="$mode_manage$">
       <label>Splunk username (identity map · blank = keep)</label>
+      <default>$sel_p_user$</default>
     </input>
     <input type="text" token="p_name" searchWhenChanged="false" depends="$mode_manage$">
       <label>Display name (blank = keep)</label>
+      <default>$sel_p_name$</default>
     </input>
     <input type="dropdown" token="p_units" searchWhenChanged="false" depends="$mode_manage$">
       <label>Default units</label>
       <choice value="">(leave unchanged)</choice>
       <choice value="metric">metric</choice>
       <choice value="imperial">imperial</choice>
-      <default></default>
+      <default>$sel_p_units$</default>
     </input>
     <input type="text" token="p_step" searchWhenChanged="false" depends="$mode_manage$">
       <label>Step goal (blank = keep)</label>
+      <default>$sel_p_step$</default>
     </input>
     <input type="text" token="p_cal" searchWhenChanged="false" depends="$mode_manage$">
       <label>Calorie goal (blank = keep)</label>
+      <default>$sel_p_cal$</default>
     </input>
     <input type="text" token="p_dist" searchWhenChanged="false" depends="$mode_manage$">
       <label>Distance goal, meters (blank = keep)</label>
+      <default>$sel_p_dist$</default>
     </input>
     <input type="text" token="p_height" searchWhenChanged="false" depends="$mode_manage$">
       <label>Height, cm (blank = keep)</label>
+      <default>$sel_p_height$</default>
     </input>
     <input type="dropdown" token="manage_confirm" searchWhenChanged="false" depends="$mode_manage$">
       <label>Confirm write</label>
@@ -114,16 +129,17 @@
         <option name="drilldown">row</option>
         <drilldown>
           <set token="paction">manage</set>
-          <set token="mode_manage">1</set>
           <unset token="mode_remove"></unset>
-          <set token="p_id">$row.person_id$</set>
-          <set token="p_user">$row.splunk_user$</set>
-          <set token="p_name">$row.person_name$</set>
-          <set token="p_units">$row.units$</set>
-          <set token="p_step">$row.step_goal$</set>
-          <set token="p_cal">$row.calorie_goal$</set>
-          <set token="p_dist">$row.distance_goal_m$</set>
-          <set token="p_height">$row.height_cm$</set>
+          <set token="sel_p_id">$row.person_id$</set>
+          <set token="sel_p_user">$row.splunk_user$</set>
+          <set token="sel_p_name">$row.person_name$</set>
+          <set token="sel_p_units">$row.units$</set>
+          <set token="sel_p_step">$row.step_goal$</set>
+          <set token="sel_p_cal">$row.calorie_goal$</set>
+          <set token="sel_p_dist">$row.distance_goal_m$</set>
+          <set token="sel_p_height">$row.height_cm$</set>
+          <unset token="mode_manage"></unset>
+          <set token="mode_manage">1</set>
         </drilldown>
       </table>
     </panel>
