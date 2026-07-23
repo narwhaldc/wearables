@@ -91,7 +91,7 @@
           <p>This page maintains the <b>wearable_person_profile</b> registry (KV Store) — the human layer over the opaque, RBAC-gated <code>person_id</code>. Writes are locked to <b>admin/sc_admin</b>; a non-admin who reaches this page can view the roster but any write returns a permission error.</p>
           <ul>
             <li><b>Add / Edit</b> — type the <code>person_id</code>. A <b>new</b> id creates the row; an <b>existing</b> id edits it. Every field left <b>blank keeps its current value</b> (read-modify-write), so you only fill what you want to change.</li>
-            <li><b>Splunk username</b> is the <b>identity map</b> (<code>$env:user$</code> → person_id) — the groundwork for the self-service profile page and for the dashboards to auto-select the logged-in user + their default units.</li>
+            <li><b>Splunk username</b> is the <b>identity map</b> (<code>$env:user$</code> → person_id) — this person's <i>own</i> Splunk login, used to auto-select the logged-in user + their default units. It must be <b>unique</b> (one login = one person); a write reusing a username already mapped elsewhere is <b>blocked</b> and the registry is left unchanged. Leave it <b>blank</b> for people who don't log in themselves — children, elders, or a coworker whose device you ingest. A caregiver is granted access to those dependents via their <b>role's <code>srchFilter</code></b> (RBAC: <code>person_id IN (…)</code>), not this field.</li>
             <li><b>Default units</b> / <b>goals</b> / <b>height</b> are the per-person display defaults the dashboards read.</li>
             <li><b>Remove</b> deletes a person's registry row (does <b>not</b> delete their indexed data — use <b>Admin: Sample Data → Clean up</b> for synthetic events).</li>
             <li>To seed a brand-new person's demo data after adding them here, use <b>Admin: Sample Data → Create</b>.</li>
@@ -119,7 +119,7 @@
 
   <row depends="$mode_manage$ $manage_confirm$">
     <panel>
-      <title>Wrote person = $p_id$</title>
+      <title>Add / Edit result — $p_id$</title>
       <table>
         <search>
           <query>| inputlookup wearable_person_profile where person_id="$p_id$"
@@ -136,10 +136,19 @@
 | eval height_cm       = if("$p_height$"!="", tonumber("$p_height$"), height_cm)
 | eval person_id=coalesce(person_id,"$p_id$")
 | where person_id!=""
-| table _key person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm
-| outputlookup append=t wearable_person_profile
-| eval status="written"
-| table status person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm</query>
+| join type=left splunk_user
+    [| inputlookup wearable_person_profile
+    | where isnotnull(splunk_user) AND splunk_user!=""
+    | stats values(person_id) as holders by splunk_user]
+| eval others=mvfilter(holders!=person_id)
+| eval blocked=if(splunk_user!="" AND mvcount(others)>0, 1, 0)
+| appendpipe
+    [| where blocked=0
+    | table _key person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm
+    | outputlookup append=t wearable_person_profile
+    | where 1=2]
+| eval outcome=if(blocked=1, "BLOCKED: Splunk username already maps to ".mvjoin(others,", ")." (registry left unchanged)", "written")
+| table outcome person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm</query>
           <earliest>-1m</earliest>
           <latest>now</latest>
         </search>
