@@ -103,16 +103,28 @@
 
   <row>
     <panel>
-      <title>Current roster — wearable_person_profile</title>
+      <title>Current roster — click a row to load it into the Add / Edit form above</title>
       <table>
         <search>
           <query>| inputlookup wearable_person_profile
-| eval person_name=coalesce(person_name, person_id)
 | sort person_id
 | table person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm</query>
         </search>
         <option name="count">50</option>
-        <option name="drilldown">none</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="paction">manage</set>
+          <set token="mode_manage">1</set>
+          <unset token="mode_remove"></unset>
+          <set token="p_id">$row.person_id$</set>
+          <set token="p_user">$row.splunk_user$</set>
+          <set token="p_name">$row.person_name$</set>
+          <set token="p_units">$row.units$</set>
+          <set token="p_step">$row.step_goal$</set>
+          <set token="p_cal">$row.calorie_goal$</set>
+          <set token="p_dist">$row.distance_goal_m$</set>
+          <set token="p_height">$row.height_cm$</set>
+        </drilldown>
       </table>
     </panel>
   </row>
