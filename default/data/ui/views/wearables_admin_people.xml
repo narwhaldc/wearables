@@ -138,20 +138,30 @@
         <drilldown>
           <set token="paction">manage</set>
           <unset token="mode_remove"></unset>
-          <!-- Use <eval> not <set>: a <set> whose $row.field$ expands to empty is
-               SKIPPED by Splunk (token keeps its prior value), so selecting a person
-               whose field is blank would leave the previous person's value in the form
-               (and "blank = keep" would then WRITE it). <eval> always assigns, so an
-               empty cell genuinely clears the field. -->
-          <eval token="sel_p_id">"$row.person_id$"</eval>
-          <eval token="sel_p_user">"$row.splunk_user$"</eval>
-          <eval token="sel_p_name">"$row.person_name$"</eval>
-          <eval token="sel_p_units">"$row.units$"</eval>
-          <eval token="sel_p_step">"$row.step_goal$"</eval>
-          <eval token="sel_p_cal">"$row.calorie_goal$"</eval>
-          <eval token="sel_p_dist">"$row.distance_goal_m$"</eval>
-          <eval token="sel_p_height">"$row.height_cm$"</eval>
-          <eval token="sel_p_birth">"$row.birth_ym$"</eval>
+          <!-- Two-phase, and it must be <set> (not <eval>): <eval> does NOT
+               $row.field$-substitute here, it assigns the literal "$row.person_id$".
+               <set> substitutes correctly but SKIPS an empty $row.field$ (keeping the
+               token's prior value). So first CLEAR every token, then set from the row:
+               a blank cell's set is skipped and the field stays cleared; a non-blank
+               cell overwrites. Net: the form exactly reflects the clicked row. -->
+          <set token="sel_p_id"></set>
+          <set token="sel_p_user"></set>
+          <set token="sel_p_name"></set>
+          <set token="sel_p_units"></set>
+          <set token="sel_p_step"></set>
+          <set token="sel_p_cal"></set>
+          <set token="sel_p_dist"></set>
+          <set token="sel_p_height"></set>
+          <set token="sel_p_birth"></set>
+          <set token="sel_p_id">$row.person_id$</set>
+          <set token="sel_p_user">$row.splunk_user$</set>
+          <set token="sel_p_name">$row.person_name$</set>
+          <set token="sel_p_units">$row.units$</set>
+          <set token="sel_p_step">$row.step_goal$</set>
+          <set token="sel_p_cal">$row.calorie_goal$</set>
+          <set token="sel_p_dist">$row.distance_goal_m$</set>
+          <set token="sel_p_height">$row.height_cm$</set>
+          <set token="sel_p_birth">$row.birth_ym$</set>
           <unset token="mode_manage"></unset>
           <set token="mode_manage">1</set>
         </drilldown>
