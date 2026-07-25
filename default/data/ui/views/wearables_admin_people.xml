@@ -10,6 +10,7 @@
     <set token="p_cal"></set>
     <set token="p_dist"></set>
     <set token="p_height"></set>
+    <set token="p_birth"></set>
     <set token="sel_p_id"></set>
     <set token="sel_p_user"></set>
     <set token="sel_p_name"></set>
@@ -18,6 +19,7 @@
     <set token="sel_p_cal"></set>
     <set token="sel_p_dist"></set>
     <set token="sel_p_height"></set>
+    <set token="sel_p_birth"></set>
     <set token="r_id"></set>
     <set token="mode_manage">1</set>
     <set token="roster_refresh"></set>
@@ -75,6 +77,10 @@
       <label>Height, cm (blank = keep)</label>
       <default>$sel_p_height$</default>
     </input>
+    <input type="text" token="p_birth" searchWhenChanged="false" depends="$mode_manage$">
+      <label>Birth month YYYY-MM (age; no day — blank = keep)</label>
+      <default>$sel_p_birth$</default>
+    </input>
     <input type="dropdown" token="manage_confirm" searchWhenChanged="false" depends="$mode_manage$">
       <label>Confirm write</label>
       <choice value="yes">Yes — write this person to the registry</choice>
@@ -123,9 +129,9 @@
       <table>
         <search>
           <query>| inputlookup wearable_person_profile ```refresh:$roster_refresh$```
-| fillnull value="" splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm
+| fillnull value="" splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym
 | sort person_id
-| table person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm</query>
+| table person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym</query>
         </search>
         <option name="count">50</option>
         <option name="drilldown">row</option>
@@ -145,6 +151,7 @@
           <eval token="sel_p_cal">"$row.calorie_goal$"</eval>
           <eval token="sel_p_dist">"$row.distance_goal_m$"</eval>
           <eval token="sel_p_height">"$row.height_cm$"</eval>
+          <eval token="sel_p_birth">"$row.birth_ym$"</eval>
           <unset token="mode_manage"></unset>
           <set token="mode_manage">1</set>
         </drilldown>
@@ -171,6 +178,7 @@
 | eval _cg = if("$p_cal$"=="null",    "", "$p_cal$")
 | eval _dg = if("$p_dist$"=="null",   "", "$p_dist$")
 | eval _hg = if("$p_height$"=="null", "", "$p_height$")
+| eval _by = if("$p_birth$"=="null",  "", "$p_birth$")
 | eval splunk_user     = if(_u!="",  _u,  splunk_user)
 | eval person_name     = if(_nm!="", _nm, person_name)
 | eval units           = if(_un!="", _un, units)
@@ -178,17 +186,18 @@
 | eval calorie_goal    = if(_cg=="", calorie_goal,    tonumber(if(_cg=="","0",_cg)))
 | eval distance_goal_m = if(_dg=="", distance_goal_m, tonumber(if(_dg=="","0",_dg)))
 | eval height_cm       = if(_hg=="", height_cm,       tonumber(if(_hg=="","0",_hg)))
+| eval birth_ym        = case(_by=="", birth_ym, match(_by,"^\d{4}-\d{2}$"), _by, true(), birth_ym)
 | where person_id!=""
 | lookup wearable_person_profile splunk_user AS splunk_user OUTPUT person_id AS owner
 | eval owner=mvindex(owner,0)
 | eval blocked=if(splunk_user!="" AND isnotnull(owner) AND owner!=person_id, 1, 0)
 | appendpipe
     [| where blocked=0
-    | table _key person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm
+    | table _key person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym
     | outputlookup append=t wearable_person_profile
     | where 1=2]
 | eval outcome=if(blocked=1, "BLOCKED: Splunk username already maps to ".owner." (registry left unchanged)", "written")
-| table outcome person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm</query>
+| table outcome person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym</query>
           <earliest>-1m</earliest>
           <latest>now</latest>
           <done>
