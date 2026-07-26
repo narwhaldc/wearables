@@ -7,7 +7,7 @@ in that add-on's own INSTALL:
 - Garmin ingest → **[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**
 - Withings ingest → **[TA-withings/INSTALL.md](https://github.com/narwhaldc/TA-withings/blob/main/INSTALL.md)**
 
-**App version:** wearables 0.1.99 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.2.0 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -108,6 +108,22 @@ fetchers stamp `person_id` directly). These are **enrichment only** — never th
 Per-person isolation = a role-level **`srchFilter = person_id="P00x"`** on the indexed `person_id`.
 Full recipe (roles, users, closing the bypasses, verification) is in the app's **`RBAC.md`**
 (deployment config — not shipped in the `.spl`; `authorize.conf` lives in the deployment, not the app).
+
+## Privacy — PII / PHI
+The platform keeps identifying data minimal and gates health data (PHI) by access control.
+- **No strong PII in the registry.** `wearable_person_profile` (KV Store) holds only low-sensitivity
+  enrichment — display name, goals, units, height, `splunk_user` (login map), and **`birth_ym`
+  (birth month + year only, `YYYY-MM` — never the day)**. Age is computed at search time; month+year
+  keeps it accurate all year except within the birth month and is **not** fraud-grade PII (a full DOB
+  is). Never store a full DOB, SSN, address, or email-as-data.
+- **The KV registry is collection-readable, not row-scoped.** `inputlookup` returns *every* person's
+  row to anyone who can run it (writes are admin-only) — shared enrichment, which is why nothing
+  sensitive lives there. True per-row isolation needs a mediated REST handler (roadmap).
+- **The real access boundary is index RBAC** (§5 above): role `srchFilter` on the **opaque `person_id`**
+  in `index=wearables`. This only protects data **where those per-person roles are configured** —
+  until then (demo/shared stacks) the temporary Person picker shows all data to all users.
+- **Nothing sensitive ships in a package.** Every `.spl` passes an automated PII/secret scan before
+  release; only synthetic (`synthetic="true"`) sample data is included.
 
 ## 6. First run, backfill, verify
 Per vendor (see the TA INSTALLs for full flags): `--dry-run`, `--backfill <date>`, then incremental,

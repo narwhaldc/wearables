@@ -31,6 +31,24 @@ Quick start + all repo links are on the in-app **Overview** page. Per-vendor ing
 - Per-person **RBAC** via role `srchFilter` on the indexed `person_id` (see `RBAC.md`).
 - Custom-viz add-ons **hypnogram_viz** + **charge_ring_viz** for the hypnogram / charge panels.
 
+## Privacy — PII / PHI
+The platform keeps identifying data minimal and gates health data (PHI) by access control.
+- **No strong PII in the registry.** `wearable_person_profile` (KV Store) holds only low-sensitivity
+  enrichment — display name, goals, units, height, `splunk_user` (login map), and **`birth_ym`
+  (birth month + year only, `YYYY-MM` — never the day)**. Age is computed at search time; month+year
+  keeps it accurate all year except within the birth month and is **not** fraud-grade PII (a full DOB
+  is). Never store a full DOB, SSN, address, or email-as-data.
+- **The KV registry is collection-readable, not row-scoped.** `inputlookup` returns *every* person's
+  row to anyone who can run it (writes are admin-only) — it is shared enrichment, which is why nothing
+  sensitive lives there. True per-row isolation needs a mediated REST handler (roadmap).
+- **The real access boundary is index RBAC.** All health data lives in `index=wearables`, keyed by an
+  **opaque `person_id`** (a surrogate key, not a name). Per-person isolation is a role **`srchFilter`**
+  on `person_id` (e.g. a caregiver limited to `person_id IN (self, dependents)`; see `RBAC.md`). This
+  only protects data **where those roles are configured** — demo/shared stacks show all data to all
+  users (hence the temporary Person picker); production must set the srchFilter roles.
+- **Nothing sensitive ships in a package.** Every `.spl` passes an automated PII/secret scan before
+  release; only synthetic (`synthetic="true"`) sample data is included.
+
 ## Scheduled maintenance
 `default/savedsearches.conf` ships a two-pass **index dedup** for `index=wearables` (tag duplicates
 → delete), scheduled +1h after oura_health's (03:00 / 03:15) so both apps coexist; Pass 2's
