@@ -7,7 +7,7 @@ in that add-on's own INSTALL:
 - Garmin ingest → **[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**
 - Withings ingest → **[TA-withings/INSTALL.md](https://github.com/narwhaldc/TA-withings/blob/main/INSTALL.md)**
 
-**App version:** wearables 0.2.16 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.2.17 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 

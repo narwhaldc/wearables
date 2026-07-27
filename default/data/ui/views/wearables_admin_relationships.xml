@@ -16,8 +16,8 @@
     <!-- Confirmations must be re-selected for every write/remove: clear on load,
          action switch, roster row-click, and when the viewer/person/relationship
          changes (same fix as the People manager). -->
-    <unset token="rel_confirm"></unset>
-    <unset token="rrem_confirm"></unset>
+    <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
+    <unset token="rrem_confirm"></unset><unset token="do_rremove"></unset>
   </init>
   <fieldset submitButton="true" autoRun="false">
     <input type="dropdown" token="raction" searchWhenChanged="true">
@@ -29,14 +29,14 @@
         <condition value="manage">
           <set token="mode_rmanage">1</set>
           <unset token="mode_rremove"></unset>
-          <unset token="rel_confirm"></unset>
-          <unset token="rrem_confirm"></unset>
+          <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
+          <unset token="rrem_confirm"></unset><unset token="do_rremove"></unset>
         </condition>
         <condition value="remove">
           <set token="mode_rremove">1</set>
           <unset token="mode_rmanage"></unset>
-          <unset token="rel_confirm"></unset>
-          <unset token="rrem_confirm"></unset>
+          <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
+          <unset token="rrem_confirm"></unset><unset token="do_rremove"></unset>
         </condition>
       </change>
     </input>
@@ -56,7 +56,7 @@
       </search>
       <default>$sel_r_viewer$</default>
       <change>
-        <unset token="rel_confirm"></unset>
+        <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
       </change>
     </input>
     <input type="dropdown" token="r_person" searchWhenChanged="false" depends="$mode_rmanage$">
@@ -73,7 +73,7 @@
       </search>
       <default>$sel_r_person$</default>
       <change>
-        <unset token="rel_confirm"></unset>
+        <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
       </change>
     </input>
     <input type="dropdown" token="r_rel" searchWhenChanged="false" depends="$mode_rmanage$">
@@ -88,7 +88,7 @@
       <choice value="viewer">viewer (other)</choice>
       <default>$sel_r_rel$</default>
       <change>
-        <unset token="rel_confirm"></unset>
+        <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
       </change>
     </input>
     <input type="dropdown" token="r_can" searchWhenChanged="false" depends="$mode_rmanage$">
@@ -99,7 +99,13 @@
     </input>
     <input type="dropdown" token="rel_confirm" searchWhenChanged="false" depends="$mode_rmanage$">
       <label>Confirm write</label>
+      <choice value="no">No — do not write</choice>
       <choice value="yes">Yes — write this relationship</choice>
+      <default>no</default>
+      <change>
+        <condition value="yes"><set token="do_rwrite">1</set></condition>
+        <condition value="no"><unset token="do_rwrite"></unset></condition>
+      </change>
     </input>
     <!-- REMOVE inputs -->
     <input type="dropdown" token="rr_key" searchWhenChanged="false" depends="$mode_rremove$">
@@ -117,12 +123,18 @@
         <latest>now</latest>
       </search>
       <change>
-        <unset token="rrem_confirm"></unset>
+        <unset token="rrem_confirm"></unset><unset token="do_rremove"></unset>
       </change>
     </input>
     <input type="dropdown" token="rrem_confirm" searchWhenChanged="false" depends="$mode_rremove$">
       <label>Confirm remove</label>
+      <choice value="no">No — do not remove</choice>
       <choice value="yes">Yes — permanently remove this relationship</choice>
+      <default>no</default>
+      <change>
+        <condition value="yes"><set token="do_rremove">1</set></condition>
+        <condition value="no"><unset token="do_rremove"></unset></condition>
+      </change>
     </input>
   </fieldset>
 
@@ -166,7 +178,7 @@
         <drilldown>
           <set token="raction">manage</set>
           <unset token="mode_rremove"></unset>
-          <unset token="rel_confirm"></unset>
+          <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
           <set token="sel_r_viewer"></set>
           <set token="sel_r_person"></set>
           <set token="sel_r_rel"></set>
@@ -182,7 +194,7 @@
     </panel>
   </row>
 
-  <row depends="$mode_rmanage$ $rel_confirm$">
+  <row depends="$mode_rmanage$ $do_rwrite$">
     <panel>
       <title>Add / Edit result — $r_viewer$ → $r_person$</title>
       <table>
@@ -201,7 +213,8 @@
 | eval can_view=if(_cn=="", coalesce(can_view, "true"), _cn)
 | where "$r_viewer$"!="" AND "$r_person$"!=""
 | appendpipe
-    [| table _key viewer_splunk_user person_id relationship can_view
+    [| where "$rel_confirm$"=="yes"
+    | table _key viewer_splunk_user person_id relationship can_view
     | outputlookup append=t wearable_relationships
     | where 1=2]
 | eval outcome="written"
@@ -220,7 +233,7 @@
     </panel>
   </row>
 
-  <row depends="$mode_rremove$ $rrem_confirm$">
+  <row depends="$mode_rremove$ $do_rremove$">
     <panel>
       <title>Removed relationship</title>
       <table>

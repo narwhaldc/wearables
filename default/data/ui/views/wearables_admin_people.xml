@@ -29,8 +29,8 @@
          are cleared here (load), on action switch, on row-click, and on picking a
          different person to remove — otherwise a prior "Yes" persists and the NEXT
          Submit writes/removes without a fresh confirmation. -->
-    <unset token="manage_confirm"></unset>
-    <unset token="remove_confirm"></unset>
+    <unset token="manage_confirm"></unset><unset token="do_write"></unset>
+    <unset token="remove_confirm"></unset><unset token="do_remove"></unset>
   </init>
   <fieldset submitButton="true" autoRun="false">
     <input type="dropdown" token="paction" searchWhenChanged="true">
@@ -42,14 +42,14 @@
         <condition value="manage">
           <set token="mode_manage">1</set>
           <unset token="mode_remove"></unset>
-          <unset token="manage_confirm"></unset>
-          <unset token="remove_confirm"></unset>
+          <unset token="manage_confirm"></unset><unset token="do_write"></unset>
+          <unset token="remove_confirm"></unset><unset token="do_remove"></unset>
         </condition>
         <condition value="remove">
           <set token="mode_remove">1</set>
           <unset token="mode_manage"></unset>
-          <unset token="manage_confirm"></unset>
-          <unset token="remove_confirm"></unset>
+          <unset token="manage_confirm"></unset><unset token="do_write"></unset>
+          <unset token="remove_confirm"></unset><unset token="do_remove"></unset>
         </condition>
       </change>
     </input>
@@ -58,7 +58,7 @@
       <label>person_id — new = add, existing = edit</label>
       <default>$sel_p_id$</default>
       <change>
-        <unset token="manage_confirm"></unset>
+        <unset token="manage_confirm"></unset><unset token="do_write"></unset>
       </change>
     </input>
     <input type="text" token="p_user" searchWhenChanged="false" depends="$mode_manage$">
@@ -102,7 +102,13 @@
     </input>
     <input type="dropdown" token="manage_confirm" searchWhenChanged="false" depends="$mode_manage$">
       <label>Confirm write</label>
+      <choice value="no">No — do not write</choice>
       <choice value="yes">Yes — write this person to the registry</choice>
+      <default>no</default>
+      <change>
+        <condition value="yes"><set token="do_write">1</set></condition>
+        <condition value="no"><unset token="do_write"></unset></condition>
+      </change>
     </input>
     <!-- REMOVE inputs -->
     <input type="dropdown" token="r_id" searchWhenChanged="false" depends="$mode_remove$">
@@ -116,12 +122,18 @@
 | table person_id label</query>
       </search>
       <change>
-        <unset token="remove_confirm"></unset>
+        <unset token="remove_confirm"></unset><unset token="do_remove"></unset>
       </change>
     </input>
     <input type="dropdown" token="remove_confirm" searchWhenChanged="false" depends="$mode_remove$">
       <label>Confirm remove</label>
+      <choice value="no">No — do not remove</choice>
       <choice value="yes">Yes — permanently remove this person's registry row</choice>
+      <default>no</default>
+      <change>
+        <condition value="yes"><set token="do_remove">1</set></condition>
+        <condition value="no"><unset token="do_remove"></unset></condition>
+      </change>
     </input>
   </fieldset>
 
@@ -161,7 +173,7 @@
         <drilldown>
           <set token="paction">manage</set>
           <unset token="mode_remove"></unset>
-          <unset token="manage_confirm"></unset>
+          <unset token="manage_confirm"></unset><unset token="do_write"></unset>
           <!-- Two-phase, and it must be <set> (not <eval>): <eval> does NOT
                $row.field$-substitute here, it assigns the literal "$row.person_id$".
                <set> substitutes correctly but SKIPS an empty $row.field$ (keeping the
@@ -195,7 +207,7 @@
     </panel>
   </row>
 
-  <row depends="$mode_manage$ $manage_confirm$">
+  <row depends="$mode_manage$ $do_write$">
     <panel>
       <title>Add / Edit result — $p_id$</title>
       <table>
@@ -230,11 +242,19 @@
 | eval owner=mvindex(owner,0)
 | eval blocked=if(splunk_user!="" AND isnotnull(owner) AND owner!=person_id, 1, 0)
 | appendpipe
-    [| where blocked=0
+    [| where blocked=0 AND "$manage_confirm$"=="yes"
     | table _key person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym household_id
     | outputlookup append=t wearable_person_profile
     | where 1=2]
-| eval outcome=if(blocked=1, "BLOCKED: Splunk username already maps to ".owner." (registry left unchanged)", "written")
+| appendpipe
+    [| where blocked=0 AND "$manage_confirm$"=="yes" AND splunk_user!=""
+    | eval viewer_splunk_user=splunk_user, relationship="self", can_view="true"
+    | eval _key=null()
+    | lookup wearable_relationships viewer_splunk_user person_id OUTPUT _key
+    | table _key viewer_splunk_user person_id relationship can_view
+    | outputlookup append=t wearable_relationships
+    | where 1=2]
+| eval outcome=if(blocked=1, "BLOCKED: Splunk username already maps to ".owner." (registry left unchanged)", if(splunk_user!="", "written (+ self view relationship)", "written"))
 | eval step_goal=tostring(step_goal), calorie_goal=tostring(calorie_goal), distance_goal_m=tostring(distance_goal_m), height_cm=tostring(height_cm)
 | table outcome person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym household_id</query>
           <earliest>-1m</earliest>
@@ -248,7 +268,7 @@
     </panel>
   </row>
 
-  <row depends="$mode_remove$ $remove_confirm$">
+  <row depends="$mode_remove$ $do_remove$">
     <panel>
       <title>Removed person = $r_id$</title>
       <table>
