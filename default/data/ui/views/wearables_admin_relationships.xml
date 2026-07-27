@@ -45,6 +45,7 @@
       <label>Viewer (who can see — a Splunk login holder)</label>
       <fieldForLabel>label</fieldForLabel>
       <fieldForValue>splunk_user</fieldForValue>
+      <choice value="">— choose a viewer —</choice>
       <search>
         <query>| inputlookup wearable_person_profile
 | where splunk_user!=""
@@ -63,6 +64,7 @@
       <label>Related person (who is being viewed)</label>
       <fieldForLabel>label</fieldForLabel>
       <fieldForValue>person_id</fieldForValue>
+      <choice value="">— choose a person —</choice>
       <search>
         <query>| inputlookup wearable_person_profile
 | eval label=person_id." — ".coalesce(person_name, person_id)
@@ -78,6 +80,7 @@
     </input>
     <input type="dropdown" token="r_rel" searchWhenChanged="false" depends="$mode_rmanage$">
       <label>Relationship (viewer is the … of the related person)</label>
+      <choice value="">— choose —</choice>
       <choice value="self">self</choice>
       <choice value="spouse">spouse / partner</choice>
       <choice value="child">child</choice>
@@ -93,6 +96,7 @@
     </input>
     <input type="dropdown" token="r_can" searchWhenChanged="false" depends="$mode_rmanage$">
       <label>Can view?</label>
+      <choice value="">— choose —</choice>
       <choice value="true">true — grant visibility</choice>
       <choice value="false">false — record relationship only</choice>
       <default>$sel_r_can$</default>
