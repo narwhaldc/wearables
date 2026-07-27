@@ -7,7 +7,7 @@ in that add-on's own INSTALL:
 - Garmin ingest → **[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**
 - Withings ingest → **[TA-withings/INSTALL.md](https://github.com/narwhaldc/TA-withings/blob/main/INSTALL.md)**
 
-**App version:** wearables 0.2.3 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.2.4 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -94,7 +94,7 @@ tokens → **gitignored, never commit** (both add-ons enforce this).
 ## 4. Populate the KV registries
 Admin-managed enrichment (KV Store in this app; write-locked to admin/sc_admin; survive upgrades).
 The easiest way is the in-app UI — **Admin → People &amp; Defaults** — which adds/edits a person's
-row (name, default units, goals, height) and maps their **Splunk login → person_id** (identity map),
+row (name, default units, goals, height, **birth month** for age) and maps their **Splunk login → person_id** (identity map),
 without touching the lookup editor. Equivalent raw SPL:
 ```
 | makeresults | eval person_id="P001", person_name="Tony", step_goal=10000
