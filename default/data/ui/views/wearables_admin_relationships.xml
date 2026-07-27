@@ -56,9 +56,6 @@
         <latest>now</latest>
       </search>
       <default>$sel_r_viewer$</default>
-      <change>
-        <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
-      </change>
     </input>
     <input type="dropdown" token="r_person" searchWhenChanged="false" depends="$mode_rmanage$">
       <label>Related person (who is being viewed)</label>
@@ -74,9 +71,6 @@
         <latest>now</latest>
       </search>
       <default>$sel_r_person$</default>
-      <change>
-        <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
-      </change>
     </input>
     <input type="dropdown" token="r_rel" searchWhenChanged="false" depends="$mode_rmanage$">
       <label>Relationship (viewer is the … of the related person)</label>
@@ -90,9 +84,6 @@
       <choice value="dependent">dependent</choice>
       <choice value="viewer">viewer (other)</choice>
       <default>$sel_r_rel$</default>
-      <change>
-        <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
-      </change>
     </input>
     <input type="dropdown" token="r_can" searchWhenChanged="false" depends="$mode_rmanage$">
       <label>Can view?</label>
@@ -127,7 +118,7 @@
         <latest>now</latest>
       </search>
       <change>
-        <unset token="rrem_confirm"></unset><unset token="do_rremove"></unset>
+        <set token="rrem_confirm">no</set><unset token="do_rremove"></unset>
       </change>
     </input>
     <input type="dropdown" token="rrem_confirm" searchWhenChanged="false" depends="$mode_rremove$">

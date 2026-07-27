@@ -57,9 +57,6 @@
     <input type="text" token="p_id" searchWhenChanged="false" depends="$mode_manage$">
       <label>person_id — new = add, existing = edit</label>
       <default>$sel_p_id$</default>
-      <change>
-        <unset token="manage_confirm"></unset><unset token="do_write"></unset>
-      </change>
     </input>
     <input type="text" token="p_user" searchWhenChanged="false" depends="$mode_manage$">
       <label>Splunk username (identity map · blank = keep)</label>
@@ -122,7 +119,7 @@
 | table person_id label</query>
       </search>
       <change>
-        <unset token="remove_confirm"></unset><unset token="do_remove"></unset>
+        <set token="remove_confirm">no</set><unset token="do_remove"></unset>
       </change>
     </input>
     <input type="dropdown" token="remove_confirm" searchWhenChanged="false" depends="$mode_remove$">
