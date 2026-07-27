@@ -25,6 +25,12 @@
     <set token="r_id"></set>
     <set token="mode_manage">1</set>
     <set token="roster_refresh"></set>
+    <!-- Confirmations must be re-selected for every write/remove. These tokens
+         are cleared here (load), on action switch, on row-click, and on picking a
+         different person to remove — otherwise a prior "Yes" persists and the NEXT
+         Submit writes/removes without a fresh confirmation. -->
+    <unset token="manage_confirm"></unset>
+    <unset token="remove_confirm"></unset>
   </init>
   <fieldset submitButton="true" autoRun="false">
     <input type="dropdown" token="paction" searchWhenChanged="true">
@@ -36,10 +42,14 @@
         <condition value="manage">
           <set token="mode_manage">1</set>
           <unset token="mode_remove"></unset>
+          <unset token="manage_confirm"></unset>
+          <unset token="remove_confirm"></unset>
         </condition>
         <condition value="remove">
           <set token="mode_remove">1</set>
           <unset token="mode_manage"></unset>
+          <unset token="manage_confirm"></unset>
+          <unset token="remove_confirm"></unset>
         </condition>
       </change>
     </input>
@@ -47,6 +57,9 @@
     <input type="text" token="p_id" searchWhenChanged="false" depends="$mode_manage$">
       <label>person_id — new = add, existing = edit</label>
       <default>$sel_p_id$</default>
+      <change>
+        <unset token="manage_confirm"></unset>
+      </change>
     </input>
     <input type="text" token="p_user" searchWhenChanged="false" depends="$mode_manage$">
       <label>Splunk username (identity map · blank = keep)</label>
@@ -102,6 +115,9 @@
 | sort person_id
 | table person_id label</query>
       </search>
+      <change>
+        <unset token="remove_confirm"></unset>
+      </change>
     </input>
     <input type="dropdown" token="remove_confirm" searchWhenChanged="false" depends="$mode_remove$">
       <label>Confirm remove</label>
@@ -145,6 +161,7 @@
         <drilldown>
           <set token="paction">manage</set>
           <unset token="mode_remove"></unset>
+          <unset token="manage_confirm"></unset>
           <!-- Two-phase, and it must be <set> (not <eval>): <eval> does NOT
                $row.field$-substitute here, it assigns the literal "$row.person_id$".
                <set> substitutes correctly but SKIPS an empty $row.field$ (keeping the
