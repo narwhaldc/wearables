@@ -136,6 +136,7 @@
         <search>
           <query>| inputlookup wearable_person_profile ```refresh:$roster_refresh$```
 | fillnull value="" splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym household_id
+| eval step_goal=tostring(step_goal), calorie_goal=tostring(calorie_goal), distance_goal_m=tostring(distance_goal_m), height_cm=tostring(height_cm)
 | sort person_id
 | table person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym household_id</query>
         </search>
@@ -217,7 +218,8 @@
     | outputlookup append=t wearable_person_profile
     | where 1=2]
 | eval outcome=if(blocked=1, "BLOCKED: Splunk username already maps to ".owner." (registry left unchanged)", "written")
-| table outcome person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym</query>
+| eval step_goal=tostring(step_goal), calorie_goal=tostring(calorie_goal), distance_goal_m=tostring(distance_goal_m), height_cm=tostring(height_cm)
+| table outcome person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym household_id</query>
           <earliest>-1m</earliest>
           <latest>now</latest>
           <done>
