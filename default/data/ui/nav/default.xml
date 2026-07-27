@@ -1,6 +1,7 @@
 <nav search_view="search" color="#0F1117">
   <view name="wearables_today" default="true" label="Today" icon="chartpanels"/>
   <view name="wearables_family" label="Family" icon="user"/>
+  <view name="wearables_family_graph" label="Family Graph" icon="chart"/>
   <view name="wearables_sleep" label="Sleep" icon="chartgauge"/>
   <view name="wearables_heart" label="Heart Health" icon="pulse"/>
   <view name="wearables_activity" label="Activity" icon="running"/>
