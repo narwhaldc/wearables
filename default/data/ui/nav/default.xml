@@ -9,6 +9,7 @@
   <view name="wearables_device" label="Device" icon="gear"/>
   <collection label="Admin" icon="bookmark">
     <view name="wearables_admin_people" label="People &amp; Defaults"/>
+    <view name="wearables_admin_relationships" label="Relationships"/>
     <view name="wearables_admin_sampledata" label="Sample Data"/>
     <view name="wearables_overview" label="Overview &amp; Quick Start"/>
   </collection>

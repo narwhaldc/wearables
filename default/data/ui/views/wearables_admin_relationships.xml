@@ -1,0 +1,242 @@
+<form version="1.1" theme="dark">
+  <label>Admin: Relationships</label>
+  <description>Define who can view whom + how they are related — writes the wearable_relationships KV Store (viewer_splunk_user → person_id, relationship). Enrichment for the Family Graph + a source for generating caregiver RBAC roles; NOT the access gate (that is authorize.conf srchFilter). Admin-only via the outputlookup approve dialog.</description>
+  <init>
+    <set token="r_viewer"></set>
+    <set token="r_person"></set>
+    <set token="r_rel"></set>
+    <set token="r_can"></set>
+    <set token="sel_r_viewer"></set>
+    <set token="sel_r_person"></set>
+    <set token="sel_r_rel"></set>
+    <set token="sel_r_can"></set>
+    <set token="rr_key"></set>
+    <set token="mode_rmanage">1</set>
+    <set token="rel_refresh"></set>
+    <!-- Confirmations must be re-selected for every write/remove: clear on load,
+         action switch, roster row-click, and when the viewer/person/relationship
+         changes (same fix as the People manager). -->
+    <unset token="rel_confirm"></unset>
+    <unset token="rrem_confirm"></unset>
+  </init>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="dropdown" token="raction" searchWhenChanged="true">
+      <label>Action</label>
+      <choice value="manage">Add / Edit a relationship</choice>
+      <choice value="remove">Remove a relationship</choice>
+      <default>manage</default>
+      <change>
+        <condition value="manage">
+          <set token="mode_rmanage">1</set>
+          <unset token="mode_rremove"></unset>
+          <unset token="rel_confirm"></unset>
+          <unset token="rrem_confirm"></unset>
+        </condition>
+        <condition value="remove">
+          <set token="mode_rremove">1</set>
+          <unset token="mode_rmanage"></unset>
+          <unset token="rel_confirm"></unset>
+          <unset token="rrem_confirm"></unset>
+        </condition>
+      </change>
+    </input>
+    <!-- ADD / EDIT inputs -->
+    <input type="dropdown" token="r_viewer" searchWhenChanged="false" depends="$mode_rmanage$">
+      <label>Viewer (who can see — a Splunk login holder)</label>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>splunk_user</fieldForValue>
+      <search>
+        <query>| inputlookup wearable_person_profile
+| where splunk_user!=""
+| eval label=coalesce(person_name, person_id)." (".splunk_user.")"
+| sort label
+| table splunk_user label</query>
+        <earliest>0</earliest>
+        <latest>now</latest>
+      </search>
+      <default>$sel_r_viewer$</default>
+      <change>
+        <unset token="rel_confirm"></unset>
+      </change>
+    </input>
+    <input type="dropdown" token="r_person" searchWhenChanged="false" depends="$mode_rmanage$">
+      <label>Related person (who is being viewed)</label>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>person_id</fieldForValue>
+      <search>
+        <query>| inputlookup wearable_person_profile
+| eval label=person_id." — ".coalesce(person_name, person_id)
+| sort person_id
+| table person_id label</query>
+        <earliest>0</earliest>
+        <latest>now</latest>
+      </search>
+      <default>$sel_r_person$</default>
+      <change>
+        <unset token="rel_confirm"></unset>
+      </change>
+    </input>
+    <input type="dropdown" token="r_rel" searchWhenChanged="false" depends="$mode_rmanage$">
+      <label>Relationship (viewer is the … of the related person)</label>
+      <choice value="self">self</choice>
+      <choice value="spouse">spouse / partner</choice>
+      <choice value="child">child</choice>
+      <choice value="parent">parent</choice>
+      <choice value="sibling">sibling</choice>
+      <choice value="caregiver">caregiver</choice>
+      <choice value="dependent">dependent</choice>
+      <choice value="viewer">viewer (other)</choice>
+      <default>$sel_r_rel$</default>
+      <change>
+        <unset token="rel_confirm"></unset>
+      </change>
+    </input>
+    <input type="dropdown" token="r_can" searchWhenChanged="false" depends="$mode_rmanage$">
+      <label>Can view?</label>
+      <choice value="true">true — grant visibility</choice>
+      <choice value="false">false — record relationship only</choice>
+      <default>$sel_r_can$</default>
+    </input>
+    <input type="dropdown" token="rel_confirm" searchWhenChanged="false" depends="$mode_rmanage$">
+      <label>Confirm write</label>
+      <choice value="yes">Yes — write this relationship</choice>
+    </input>
+    <!-- REMOVE inputs -->
+    <input type="dropdown" token="rr_key" searchWhenChanged="false" depends="$mode_rremove$">
+      <label>Relationship to remove</label>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>_key</fieldForValue>
+      <search>
+        <query>| inputlookup wearable_relationships
+| lookup wearable_person_profile splunk_user AS viewer_splunk_user OUTPUT person_name AS vn
+| lookup wearable_person_profile person_id OUTPUT person_name AS rn
+| eval label=coalesce(vn, viewer_splunk_user)." → ".coalesce(rn, person_id)." (".relationship.")"
+| sort label
+| table _key label</query>
+        <earliest>0</earliest>
+        <latest>now</latest>
+      </search>
+      <change>
+        <unset token="rrem_confirm"></unset>
+      </change>
+    </input>
+    <input type="dropdown" token="rrem_confirm" searchWhenChanged="false" depends="$mode_rremove$">
+      <label>Confirm remove</label>
+      <choice value="yes">Yes — permanently remove this relationship</choice>
+    </input>
+  </fieldset>
+
+  <row>
+    <panel>
+      <html>
+        <div style="padding:8px 4px; line-height:1.5">
+          <div style="border:2px solid #F4A422; background:rgba(244,164,34,0.12); border-radius:6px; padding:12px 14px; margin-bottom:14px; color:#F4A422; font-weight:600">
+            ⚠ After you click <b>Submit</b>, Splunk shows a small <b>"potential security risk"</b> dialog (it approves the <code>outputlookup</code> command). On the dark theme it is easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b>. Nothing is written until you finish the fields (including <b>Confirm</b>), click <b>Submit</b>, and approve.
+          </div>
+          <p>This page maintains the <b>wearable_relationships</b> registry (KV Store) — the caregiver→dependent edges that power the <b>Family Graph</b> and are the source for generating each viewer's per-person RBAC roles. Writes are locked to <b>admin/sc_admin</b>.</p>
+          <ul>
+            <li><b>Viewer</b> is the person who can see — chosen from people who have a <b>Splunk login</b> mapped (set that on <b>Admin → People &amp; Defaults</b>). People with no login cannot be a viewer.</li>
+            <li><b>Related person</b> is who is being viewed (any person). <b>Relationship</b> is how the viewer relates to them (a <b>self</b> edge marks the viewer's own person).</li>
+            <li>One edge per <b>viewer → related person</b>: re-writing the same pair <b>updates</b> it (relationship / can-view), it does not duplicate.</li>
+            <li><b>Access is still enforced by RBAC</b> (<code>srchFilter</code> on <code>person_id</code>), not this table — see <b>RBAC.md</b>. This registry is enrichment + the source for role generation.</li>
+          </ul>
+        </div>
+      </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Current relationships — click a row to load it into the Add / Edit form above</title>
+      <table>
+        <search>
+          <query>| inputlookup wearable_relationships ```refresh:$rel_refresh$```
+| lookup wearable_person_profile splunk_user AS viewer_splunk_user OUTPUT person_name AS viewer_name
+| lookup wearable_person_profile person_id OUTPUT person_name AS related_name
+| fillnull value="" relationship can_view
+| eval Viewer=coalesce(viewer_name, viewer_splunk_user), Related=coalesce(related_name, person_id)
+| sort Viewer Related
+| table Viewer Related relationship can_view viewer_splunk_user person_id</query>
+          <earliest>0</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">50</option>
+        <option name="drilldown">row</option>
+        <option name="columnFormat">{}</option>
+        <drilldown>
+          <set token="raction">manage</set>
+          <unset token="mode_rremove"></unset>
+          <unset token="rel_confirm"></unset>
+          <set token="sel_r_viewer"></set>
+          <set token="sel_r_person"></set>
+          <set token="sel_r_rel"></set>
+          <set token="sel_r_can"></set>
+          <set token="sel_r_viewer">$row.viewer_splunk_user$</set>
+          <set token="sel_r_person">$row.person_id$</set>
+          <set token="sel_r_rel">$row.relationship$</set>
+          <set token="sel_r_can">$row.can_view$</set>
+          <unset token="mode_rmanage"></unset>
+          <set token="mode_rmanage">1</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+
+  <row depends="$mode_rmanage$ $rel_confirm$">
+    <panel>
+      <title>Add / Edit result — $r_viewer$ → $r_person$</title>
+      <table>
+        <search>
+          <query>| inputlookup wearable_relationships
+| eval _match=if(viewer_splunk_user=="$r_viewer$" AND person_id=="$r_person$", 1, 0)
+| where _match=1
+| appendpipe
+    [| stats count
+    | where count==0
+    | eval viewer_splunk_user="$r_viewer$", person_id="$r_person$"]
+| eval viewer_splunk_user="$r_viewer$", person_id="$r_person$"
+| eval _rel=if("$r_rel$"=="null", "", "$r_rel$")
+| eval relationship=if(_rel=="", coalesce(relationship, "viewer"), _rel)
+| eval _cn=if("$r_can$"=="null", "", "$r_can$")
+| eval can_view=if(_cn=="", coalesce(can_view, "true"), _cn)
+| where "$r_viewer$"!="" AND "$r_person$"!=""
+| appendpipe
+    [| table _key viewer_splunk_user person_id relationship can_view
+    | outputlookup append=t wearable_relationships
+    | where 1=2]
+| eval outcome="written"
+| lookup wearable_person_profile splunk_user AS viewer_splunk_user OUTPUT person_name AS Viewer
+| lookup wearable_person_profile person_id OUTPUT person_name AS Related
+| eval Viewer=coalesce(Viewer, viewer_splunk_user), Related=coalesce(Related, person_id)
+| table outcome Viewer Related relationship can_view</query>
+          <earliest>-1m</earliest>
+          <latest>now</latest>
+          <done>
+            <set token="rel_refresh">$job.sid$</set>
+          </done>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <row depends="$mode_rremove$ $rrem_confirm$">
+    <panel>
+      <title>Removed relationship</title>
+      <table>
+        <search>
+          <query>| inputlookup wearable_relationships
+| where _key!="$rr_key$"
+| outputlookup wearable_relationships
+| stats count as relationships_remaining</query>
+          <earliest>-1m</earliest>
+          <latest>now</latest>
+          <done>
+            <set token="rel_refresh">$job.sid$</set>
+          </done>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

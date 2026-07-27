@@ -7,7 +7,7 @@ in that add-on's own INSTALL:
 - Garmin ingest → **[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**
 - Withings ingest → **[TA-withings/INSTALL.md](https://github.com/narwhaldc/TA-withings/blob/main/INSTALL.md)**
 
-**App version:** wearables 0.2.15 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.2.16 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -36,7 +36,7 @@ Withings  ─▶ TA-withings/tools/withings_to_hec.py   (pull, OAuth2)
                          ▼
         TA-oura / TA-garmin / TA-withings  ── search-time normalization ──▶ canonical fields + tags
                          ▼
-        wearables  ── data model (Sleep/HeartRate/Activity/Workout/Daily/Device) + 7 dashboards
+        wearables  ── data model (Sleep/HeartRate/Activity/Workout/Daily/Device) + 8 dashboards
                          ▼
         Per-person isolation via role srchFilter on the indexed person_id (RBAC)
 ```
@@ -103,7 +103,7 @@ without touching the lookup editor. Equivalent raw SPL:
 `wearable_device_profile` (device_id→friendly name) can be derived from data after first ingest, or
 edited by admins. `wearable_identity_map` (vendor,vendor_user_id→person_id) is optional (the
 fetchers stamp `person_id` directly). `wearable_relationships` (viewer_splunk_user, person_id,
-relationship, can_view) records family **caregiver→dependent** edges — the source for generating a
+relationship, can_view; edit via Admin → Relationships) records family **caregiver→dependent** edges — the source for generating a
 caregiver's per-person roles (see [RBAC.md](RBAC.md) → *Family / caregiver access*) and the **Family**
 roster. These are all **enrichment only** — never the access gate.
 
