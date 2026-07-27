@@ -33,6 +33,10 @@ export = system
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
 
+[transforms/wearable_relationships]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
 ## KV Store collections — read broad, WRITE locked to admin/sc_admin (this is the
 ## write-integrity gate: restricted users cannot outputlookup / REST-write these).
 [collections/wearable_identity_map]
@@ -44,6 +48,10 @@ access = read : [ * ], write : [ admin, sc_admin ]
 export = system
 
 [collections/wearable_device_profile]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+[collections/wearable_relationships]
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
 

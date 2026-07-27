@@ -7,7 +7,7 @@ in that add-on's own INSTALL:
 - Garmin ingest → **[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**
 - Withings ingest → **[TA-withings/INSTALL.md](https://github.com/narwhaldc/TA-withings/blob/main/INSTALL.md)**
 
-**App version:** wearables 0.2.4 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.2.6 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -36,7 +36,7 @@ Withings  ─▶ TA-withings/tools/withings_to_hec.py   (pull, OAuth2)
                          ▼
         TA-oura / TA-garmin / TA-withings  ── search-time normalization ──▶ canonical fields + tags
                          ▼
-        wearables  ── data model (Sleep/HeartRate/Activity/Workout/Daily/Device) + 6 dashboards
+        wearables  ── data model (Sleep/HeartRate/Activity/Workout/Daily/Device) + 7 dashboards
                          ▼
         Per-person isolation via role srchFilter on the indexed person_id (RBAC)
 ```
@@ -94,7 +94,7 @@ tokens → **gitignored, never commit** (both add-ons enforce this).
 ## 4. Populate the KV registries
 Admin-managed enrichment (KV Store in this app; write-locked to admin/sc_admin; survive upgrades).
 The easiest way is the in-app UI — **Admin → People &amp; Defaults** — which adds/edits a person's
-row (name, default units, goals, height, **birth month** for age) and maps their **Splunk login → person_id** (identity map),
+row (name, default units, goals, height, **birth month** for age, **household**) and maps their **Splunk login → person_id** (identity map),
 without touching the lookup editor. Equivalent raw SPL:
 ```
 | makeresults | eval person_id="P001", person_name="Tony", step_goal=10000
@@ -102,7 +102,10 @@ without touching the lookup editor. Equivalent raw SPL:
 ```
 `wearable_device_profile` (device_id→friendly name) can be derived from data after first ingest, or
 edited by admins. `wearable_identity_map` (vendor,vendor_user_id→person_id) is optional (the
-fetchers stamp `person_id` directly). These are **enrichment only** — never the access gate.
+fetchers stamp `person_id` directly). `wearable_relationships` (viewer_splunk_user, person_id,
+relationship, can_view) records family **caregiver→dependent** edges — the source for generating a
+caregiver's per-person roles (see [RBAC.md](RBAC.md) → *Family / caregiver access*) and the **Family**
+roster. These are all **enrichment only** — never the access gate.
 
 ## 5. Multi-user RBAC
 Per-person isolation = a role-level **`srchFilter = person_id="P00x"`** on the indexed `person_id`.
@@ -132,7 +135,7 @@ and `--status`. Then confirm:
 index=wearables | stats count by vendor, sourcetype
 index=wearables tag=wearable_sleep | table _time vendor total_sleep_min sleep_score
 ```
-Open the dashboards: **Today · Sleep · Heart · Activity · Wellness · Device** (temp "Person" picker
+Open the dashboards: **Today · Family · Sleep · Heart · Activity · Wellness · Device** (temp "Person" picker
 lets an admin switch persons until RBAC is enforced).
 
 > **Test without a device:** `garmin_to_hec.py --generate-sample-data` sends synthetic `synthetic="true"`

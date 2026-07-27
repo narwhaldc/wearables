@@ -69,6 +69,32 @@ the UI/ACS there.)
 Each person-user gets **only** their `role_wearables_P00x` (plus base `user`).
 Household viewers get `role_wearables_household`.
 
+### Family / caregiver access (one viewer, several dependents)
+You do **not** need a special filter to let a caregiver see their whole family.
+Splunk **OR**s `srchFilter`s across a user's roles (the same additive behavior
+that Step 4 warns about — here we use it deliberately). So assign the caregiver
+user **the per-person role of each family member**:
+
+```
+# Caregiver "pat" sees themselves (P001) + two dependents (P004, P007):
+#   Settings → Users → pat → Roles = [ role_wearables_P001,
+#                                       role_wearables_P004,
+#                                       role_wearables_P007 ]
+# Result: srchFilter = person_id="P001" OR person_id="P004" OR person_id="P007"
+```
+
+No new role and no custom filter — the union falls out of role composition, and
+because the **Family** dashboard and every person picker run *under* that filter
+(`tstats … by person_id`), they automatically list exactly that family.
+
+**Source of truth for who-sees-whom:** the `wearable_relationships` KV collection
+(`viewer_splunk_user, person_id, relationship, can_view`) records each caregiver
+→ dependent edge. Use it to *generate* the role assignments above (and to label
+the relationship network diagram); it is **enrichment, not the gate** — the gate
+is still the `srchFilter`. `household_id` on `wearable_person_profile` is the
+grouping key the Family roster displays. Manage both in **Admin → People &amp;
+Defaults**.
+
 ## Step 4 — Close the bypasses (critical)
 - **Additive-roles gotcha:** Splunk ORs `srchFilter`s across a user's roles, so
   the person-role must be the **only** role granting `wearables`. Ensure the base
