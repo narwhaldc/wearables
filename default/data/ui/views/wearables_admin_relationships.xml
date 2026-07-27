@@ -178,7 +178,7 @@
         <drilldown>
           <set token="raction">manage</set>
           <unset token="mode_rremove"></unset>
-          <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
+          <set token="rel_confirm">no</set><unset token="do_rwrite"></unset>
           <set token="sel_r_viewer"></set>
           <set token="sel_r_person"></set>
           <set token="sel_r_rel"></set>

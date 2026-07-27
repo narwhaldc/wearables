@@ -173,7 +173,7 @@
         <drilldown>
           <set token="paction">manage</set>
           <unset token="mode_remove"></unset>
-          <unset token="manage_confirm"></unset><unset token="do_write"></unset>
+          <set token="manage_confirm">no</set><unset token="do_write"></unset>
           <!-- Two-phase, and it must be <set> (not <eval>): <eval> does NOT
                $row.field$-substitute here, it assigns the literal "$row.person_id$".
                <set> substitutes correctly but SKIPS an empty $row.field$ (keeping the
