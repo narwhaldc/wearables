@@ -95,6 +95,19 @@ is still the `srchFilter`. `household_id` on `wearable_person_profile` is the
 grouping key the Family roster displays. Manage both in **Admin → People &amp;
 Defaults**.
 
+**Why per-person roles composed, and NOT one role per household:** keep the
+*per-person* role as the atomic unit and grant a caregiver several of them.
+A single household role (`srchFilter = person_id IN (all members)`) forces
+**symmetric** visibility — everyone in the household sees everyone else — which
+is wrong for the common cases: a parent should see a child without the child
+seeing the parent (or a sibling), and a person can belong to **overlapping**
+households (blended families, a grandparent, a caregiver spanning clients).
+Per-person composition expresses any of those; a household role cannot. It also
+keeps change local (add a member → create their one role, assign it to whoever
+should see them — no editing a shared `IN (...)` list that could expose the whole
+group on a typo). Keep `role_wearables_household` (no `srchFilter`) only as an
+admin/analyst "see everyone" convenience, not the family mechanism.
+
 ## Step 4 — Close the bypasses (critical)
 - **Additive-roles gotcha:** Splunk ORs `srchFilter`s across a user's roles, so
   the person-role must be the **only** role granting `wearables`. Ensure the base
