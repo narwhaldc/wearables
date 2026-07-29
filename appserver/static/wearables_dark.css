@@ -1,0 +1,45 @@
+/*
+ * wearables_dark.css — pull the classic SimpleXML admin pages toward the same
+ * near-black (#0F1117) as the Dashboard Studio content pages + the nav bar, so the
+ * whole app reads as one theme. Applied via the dashboard `stylesheet="..."`
+ * attribute on the four admin views. Cosmetic only — no behavior change.
+ *
+ * NOTE: Splunk Cloud may strip custom dashboard CSS depending on stack policy; on
+ * Splunk Enterprise it applies. Classic-dashboard DOM classes vary a little across
+ * Splunk versions, so if a chrome element stays gray, add its selector here.
+ */
+
+/* Page canvas + rows */
+.dashboard-body,
+.dashboard-row,
+.dashboard-header,
+.dashboard-view-controls,
+.main-section-body {
+    background-color: #0F1117 !important;
+}
+
+/* Input / fieldset bar */
+.fieldset,
+.dashboard-body .fieldset {
+    background-color: #0F1117 !important;
+    border-color: #23262E !important;
+}
+
+/* Panels */
+.dashboard-panel,
+.dashboard-element,
+.panel-element-row,
+.panel-body,
+.panel-head {
+    background-color: #0F1117 !important;
+}
+.dashboard-panel {
+    border: 1px solid #23262E !important;
+    box-shadow: none !important;
+}
+
+/* Panel titles */
+.dashboard-panel .panel-head h3,
+.panel-title {
+    color: #E7ECF2 !important;
+}
