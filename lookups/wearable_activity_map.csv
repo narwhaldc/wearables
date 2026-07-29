@@ -1,0 +1,41 @@
+workout_activity,workout_activity_canon,workout_activity_group
+cycling,Cycling,Cardio
+outdoor cycling,Cycling,Cardio
+indoor cycling,Cycling,Cardio
+biking,Cycling,Cardio
+mountain biking,Cycling,Cardio
+walk,Walking,Cardio
+walking,Walking,Cardio
+outdoor walk,Walking,Cardio
+indoor walk,Walking,Cardio
+hiking,Hiking,Cardio
+hike,Hiking,Cardio
+running,Running,Cardio
+run,Running,Cardio
+outdoor run,Running,Cardio
+indoor run,Running,Cardio
+trail_running,Running,Cardio
+trail running,Running,Cardio
+treadmill_running,Running,Cardio
+treadmill running,Running,Cardio
+elliptical,Elliptical,Cardio
+cross training,Elliptical,Cardio
+cross trainer,Elliptical,Cardio
+rowing,Rowing,Cardio
+indoor rowing,Rowing,Cardio
+swimming,Swimming,Cardio
+swim,Swimming,Cardio
+open water swimming,Swimming,Cardio
+pool swim,Swimming,Cardio
+strength_training,Strength,Strength
+strength training,Strength,Strength
+functional strength training,Strength,Strength
+traditional strength training,Strength,Strength
+weight training,Strength,Strength
+core training,Strength,Strength
+yoga,Yoga,Flexibility
+pilates,Pilates,Flexibility
+stretching,Flexibility,Flexibility
+flexibility,Flexibility,Flexibility
+hiit,HIIT,Cardio
+high intensity interval training,HIIT,Cardio

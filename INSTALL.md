@@ -8,7 +8,7 @@ in that add-on's own INSTALL:
 - Withings ingest → **[TA-withings/INSTALL.md](https://github.com/narwhaldc/TA-withings/blob/main/INSTALL.md)**
 - Apple Health ingest → **[TA-apple/INSTALL.md](https://github.com/narwhaldc/TA-apple/blob/main/INSTALL.md)** (Health Auto Export → cloud file-drop → puller; covers Apple Watch + anything in HealthKit)
 
-**App version:** wearables 0.2.21 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.2.22 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -157,6 +157,12 @@ lets an admin switch persons until RBAC is enforced).
 - **Index dedup** (two-pass tag→delete for `index=wearables`), +1h after oura_health's (03:00 / 03:15)
   so both apps coexist; Pass 2's `| delete` needs `can_delete`. Overlap re-fetch dupes are cleaned here.
 - **Registry backup** — nightly dump of the KV registries to the index (survives a full app removal).
+- **Wearables Data Quality — Monitor** (03:30) — flags unmapped workout activity labels and feeds
+  gone silent (> 48h); fires (`alert.track`) only when there's a finding. Live view: **Admin →
+  Ingest &amp; Data Quality** (feed freshness, cross-pipeline double-representation, unmapped
+  labels/metrics, missing canonical fields). Map a new workout label by adding a row to the
+  admin-editable `wearable_activity_map.csv` (the Workout data model exposes `workout_activity_canon`
+  + `workout_activity_group` from it; raw `workout_activity` is preserved).
 
 ## Troubleshooting
 - **Dashboards empty** → confirm the vendor add-on is installed (props/tags fire) and data is in

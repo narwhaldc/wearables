@@ -55,5 +55,16 @@ export = system
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
 
+## Canonical workout-activity taxonomy (CSV lookup). Exported global because the
+## system-exported Wearables data model resolves it in a Lookup calculation. Read
+## broad; the CSV is admin-editable (add rows to map new labels).
+[transforms/wearable_activity_map]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+[lookups/wearable_activity_map.csv]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
 [macros]
 export = system

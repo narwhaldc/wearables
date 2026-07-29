@@ -11,6 +11,7 @@
     <view name="wearables_admin_people" label="People &amp; Defaults"/>
     <view name="wearables_admin_relationships" label="Relationships"/>
     <view name="wearables_admin_sampledata" label="Sample Data"/>
+    <view name="wearables_admin_dataquality" label="Ingest &amp; Data Quality"/>
     <view name="wearables_overview" label="Overview &amp; Quick Start"/>
   </collection>
   <collection label="Explore" icon="magnifier">

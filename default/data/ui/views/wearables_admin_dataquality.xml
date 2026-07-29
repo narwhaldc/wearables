@@ -1,0 +1,157 @@
+<dashboard version="1.1" theme="dark">
+  <label>Admin: Ingest &amp; Data Quality</label>
+  <description>Operational health of the Wearables pipeline: per-feed freshness, cross-pipeline double-representation, unmapped activity labels + Apple metrics, and missing canonical fields. Read-only diagnostics — pairs with the "Wearables Data Quality — Monitor" scheduled search.</description>
+
+  <row>
+    <panel>
+      <html>
+        <div style="padding:8px 4px; line-height:1.5">
+          <p>Everything the platform ingests lands in <code>`widx`</code> (index=wearables). This page watches for the things that quietly go wrong: a <b>feed that stopped</b> (a broken cron, an expired token), the <b>same measurement counted twice</b> through different pipelines, and <b>new data shapes we haven't mapped yet</b> (activity labels, Apple metrics). Add a row to <b>wearable_activity_map.csv</b> to map a new workout label; promote a useful <code>apple:extra</code> metric into the puller's <code>METRIC_MAP</code>.</p>
+        </div>
+      </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Ingest freshness — last event per feed (vendor × sourcetype, 30d)</title>
+      <table>
+        <search>
+          <query>`widx`
+| stats count as events_30d latest(_time) as last_epoch by vendor sourcetype
+| eval age_h=round((now()-last_epoch)/3600,1)
+| eval status=case(age_h&lt;=30,"🟢 ok", age_h&lt;=72,"🟡 stale", true(),"🔴 critical")
+| eval last_seen=strftime(last_epoch,"%Y-%m-%d %H:%M")
+| eval age_h=tostring(age_h), events_30d=tostring(events_30d,"commas")
+| table vendor sourcetype status age_h last_seen events_30d
+| rename age_h as "age (h)", last_seen as "last seen", events_30d as "events (30d)"
+| sort vendor sourcetype</query>
+          <earliest>-30d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">50</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">false</option>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>⚠ Stale or silent feeds (&gt; 48h since last event)</title>
+      <table>
+        <search>
+          <query>`widx`
+| stats latest(_time) as last_epoch by vendor sourcetype
+| eval age_h=round((now()-last_epoch)/3600,1)
+| where age_h&gt;48
+| eval last_seen=strftime(last_epoch,"%Y-%m-%d %H:%M"), age_d=tostring(round(age_h/24,1))
+| table vendor sourcetype age_d last_seen
+| rename age_d as "age (days)", last_seen as "last seen"
+| sort - "age (days)"</query>
+          <earliest>-30d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">20</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">false</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Events missing canonical keys (person_id / vendor, 7d)</title>
+      <table>
+        <search>
+          <query>`widx`
+| where isnull(person_id) OR person_id="" OR isnull(vendor) OR vendor=""
+| eval missing=mvappend(if(isnull(person_id) OR person_id="","person_id",null()), if(isnull(vendor) OR vendor="","vendor",null()))
+| stats count by sourcetype missing
+| sort - count</query>
+          <earliest>-7d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">20</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Unmapped workout activity labels (90d) — add a row to wearable_activity_map.csv</title>
+      <table>
+        <search>
+          <query>`widx` tag=wearable_workout
+| lookup wearable_activity_map workout_activity OUTPUT workout_activity_canon
+| where isnull(workout_activity_canon)
+| stats count as workouts values(vendor) as vendors by workout_activity
+| eval workouts=tostring(workouts,"commas")
+| rename workout_activity as "raw label (unmapped)"
+| sort - workouts</query>
+          <earliest>-90d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">30</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">false</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Unmapped Apple metrics — apple:extra (30d) — candidates for METRIC_MAP</title>
+      <table>
+        <search>
+          <query>`widx` sourcetype=apple:extra
+| stats sum(count) as samples dc(day) as days values(vendor) as vendors by metric
+| eval samples=tostring(samples,"commas")
+| rename metric as "apple metric (unmapped)"
+| sort - days</query>
+          <earliest>-30d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">30</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">false</option>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Cross-pipeline double-representation (30d) — same person·vendor·day·domain ingested BOTH directly and via the Apple relay</title>
+      <table>
+        <search>
+          <query>`widx` (sourcetype=*sleep* OR sourcetype=*body* OR sourcetype=*bodycomp*)
+| eval domain=if(match(sourcetype,"sleep"),"sleep","bodycomp")
+| eval pipe=if(match(sourcetype,"^apple:"),"apple-relay","direct")
+| stats dc(pipe) as n_pipes values(pipe) as pipes values(sourcetype) as sourcetypes by person_id vendor day domain
+| where n_pipes&gt;1
+| eval sourcetypes=mvjoin(sourcetypes," + ")
+| table person_id vendor day domain sourcetypes
+| sort - day</query>
+          <earliest>-30d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">30</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">false</option>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Daily ingest volume by vendor (30d) — watch for a feed dropping to zero</title>
+      <chart>
+        <search>
+          <query>`widx`
+| timechart span=1d count by vendor</query>
+          <earliest>-30d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>

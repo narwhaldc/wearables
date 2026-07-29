@@ -858,7 +858,57 @@
           "comment": ""
         }
       ],
-      "calculations": []
+      "calculations": [
+        {
+          "calculationID": "wearable_activity_canon",
+          "calculationType": "Lookup",
+          "editable": true,
+          "comment": "Canonical workout-activity taxonomy. Case-insensitive CSV lookup (wearable_activity_map) mapping the raw vendor label to a normalized workout_activity_canon + coarse workout_activity_group. Raw workout_activity is preserved; unmapped labels return null canon (surfaced on the Data Quality admin page).",
+          "lookupName": "wearable_activity_map",
+          "inputFieldMappings": [
+            {
+              "lookupField": "workout_activity",
+              "inputField": "workout_activity"
+            }
+          ],
+          "outputFieldMappings": [
+            {
+              "lookupField": "workout_activity_canon",
+              "outputField": "workout_activity_canon"
+            },
+            {
+              "lookupField": "workout_activity_group",
+              "outputField": "workout_activity_group"
+            }
+          ],
+          "outputFields": [
+            {
+              "fieldName": "workout_activity_canon",
+              "owner": "Workout",
+              "type": "string",
+              "fieldSearch": "",
+              "required": false,
+              "multivalue": false,
+              "hidden": false,
+              "editable": true,
+              "displayName": "workout_activity_canon (normalized)",
+              "comment": ""
+            },
+            {
+              "fieldName": "workout_activity_group",
+              "owner": "Workout",
+              "type": "string",
+              "fieldSearch": "",
+              "required": false,
+              "multivalue": false,
+              "hidden": false,
+              "editable": true,
+              "displayName": "workout_activity_group (Cardio/Strength/Flexibility)",
+              "comment": ""
+            }
+          ]
+        }
+      ]
     },
     {
       "objectName": "Daily",
