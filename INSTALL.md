@@ -6,8 +6,9 @@ in that add-on's own INSTALL:
 - Oura ingest → **[TA-oura/INSTALL.md](https://github.com/narwhaldc/TA-oura/blob/main/INSTALL.md)**
 - Garmin ingest → **[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**
 - Withings ingest → **[TA-withings/INSTALL.md](https://github.com/narwhaldc/TA-withings/blob/main/INSTALL.md)**
+- Apple Health ingest → **[TA-apple/INSTALL.md](https://github.com/narwhaldc/TA-apple/blob/main/INSTALL.md)** (Health Auto Export → cloud file-drop → puller; covers Apple Watch + anything in HealthKit)
 
-**App version:** wearables 0.2.20 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.2.21 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -31,10 +32,11 @@ in that add-on's own INSTALL:
 Oura Ring ─▶ TA-oura/tools/oura_to_hec_with_phi.py  (pull, OAuth2)
 Garmin    ─▶ TA-garmin/tools/garmin_to_hec.py       (pull, python-garminconnect)
 Withings  ─▶ TA-withings/tools/withings_to_hec.py   (pull, OAuth2)
+Apple/iOS ─▶ Health Auto Export (iOS) → cloud file-drop → TA-apple/tools/apple_to_hec.py  (pull, files)
                          │  HEC: index=wearables, sourcetype=<vendor>:<type>,
                          │       indexed fields vendor + person_id
                          ▼
-        TA-oura / TA-garmin / TA-withings  ── search-time normalization ──▶ canonical fields + tags
+        TA-oura / TA-garmin / TA-withings / TA-apple  ── search-time normalization ──▶ canonical fields + tags
                          ▼
         wearables  ── data model (Sleep/HeartRate/Activity/Workout/Daily/Device) + 8 dashboards
                          ▼
@@ -50,6 +52,7 @@ internet-facing. Ingest scripts are **repo-only** (never shipped in a `.spl` —
 | **TA-oura** (Oura normalize + `tools/` fetcher) | [narwhaldc/TA-oura](https://github.com/narwhaldc/TA-oura) | app yes, `tools/` no |
 | **TA-garmin** (Garmin normalize + `tools/` poller) | [narwhaldc/TA-garmin](https://github.com/narwhaldc/TA-garmin) | app yes, `tools/` no |
 | **TA-withings** (Withings normalize + `tools/` fetcher) | [narwhaldc/TA-withings](https://github.com/narwhaldc/TA-withings) | app yes, `tools/` no |
+| **TA-apple** (Apple Health normalize + `tools/` puller) | [narwhaldc/TA-apple](https://github.com/narwhaldc/TA-apple) | app yes, `tools/` no |
 | **hypnogram_viz** (custom viz) | [narwhaldc/hypnogram_viz](https://github.com/narwhaldc/hypnogram_viz) | yes |
 | **charge_ring_viz** (custom viz) | [narwhaldc/charge_ring_viz](https://github.com/narwhaldc/charge_ring_viz) | yes |
 
@@ -57,7 +60,8 @@ internet-facing. Ingest scripts are **repo-only** (never shipped in a `.spl` —
 - Splunk Enterprise 10.x or Splunk Cloud, with HTTP Event Collector enabled.
 - Admin (install apps, create index, populate KV registries, set roles).
 - A host with **Python 3.9+** (Oura fetcher) / **3.10+** (Garmin poller — `garminconnect` needs it).
-- Vendor credentials: an Oura developer app (OAuth2) and/or a Garmin account (see the TA INSTALLs).
+- Vendor credentials: an Oura developer app (OAuth2), a Garmin account, and/or Withings OAuth2 (see the
+  TA INSTALLs). Apple Health needs no credentials — the iOS Health Auto Export app + a synced cloud folder.
 
 ---
 
@@ -78,7 +82,7 @@ internet-facing. Ingest scripts are **repo-only** (never shipped in a `.spl` —
 
 ## 2. Install the apps
 Install (Apps → Install app from file) and **restart Splunk** so custom-viz JS + the data model load:
-1. **TA-oura**, **TA-garmin**, and/or **TA-withings** (normalization the model constrains on).
+1. **TA-oura**, **TA-garmin**, **TA-withings**, and/or **TA-apple** (normalization the model constrains on).
 2. **wearables** (data model + dashboards + KV registries).
 3. **hypnogram_viz** + **charge_ring_viz** (hypnogram + charge panels).
 
@@ -87,9 +91,16 @@ Copy the vendor's script from its add-on `tools/` to your ingest host and follow
 - **Oura:** `oura_to_hec_with_phi.py` — OAuth2 `--auth`, `oura_targets.json`. See **TA-oura/INSTALL.md**.
 - **Garmin:** `garmin_to_hec.py` — one-time `garmin_probe.py` login, `garmin_targets.json`. See **TA-garmin/INSTALL.md**.
 - **Withings:** `withings_to_hec.py` — OAuth2 `--auth`, `withings_targets.json`. See **TA-withings/INSTALL.md**.
+- **Apple Health:** no vendor API — the iOS **Health Auto Export** app (its **automatic/scheduled
+  export requires the paid subscription**) writes JSON export files to a
+  cloud folder (iCloud / Dropbox / Google Drive), which a sync client (`rclone`/native) mirrors to a
+  local `watch_dir`; `apple_to_hec.py` then pulls those files (cron wrapper `apple_sync.sh`),
+  `apple_targets.json`. **Apple is an aggregator** — it can carry samples that originated on Oura,
+  Garmin, etc.; the puller maps each sample's HealthKit source → canonical `vendor` and has a
+  `skip_sources` list to avoid double-counting a vendor you already ingest directly. See **TA-apple/INSTALL.md**.
 
-Both point HEC at `index=wearables` and stamp indexed `vendor` + `person_id`. Targets files hold
-tokens → **gitignored, never commit** (both add-ons enforce this).
+All point HEC at `index=wearables` and stamp indexed `vendor` + `person_id`. Targets files hold
+tokens → **gitignored, never commit** (all add-ons enforce this).
 
 ## 4. Populate the KV registries
 Admin-managed enrichment (KV Store in this app; write-locked to admin/sc_admin; survive upgrades).
