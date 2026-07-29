@@ -55,8 +55,14 @@ export = system
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
 
+## Platform props: the automatic workout-activity lookup (LOOKUP-wearable_activity
+## on the workout sourcetypes) — exported global so workout_activity_canon/_group
+## resolve in any app context (like the vendor TAs export their normalization props).
+[props]
+export = system
+
 ## Canonical workout-activity taxonomy (CSV lookup). Exported global because the
-## system-exported Wearables data model resolves it in a Lookup calculation. Read
+## system-exported Wearables data model + the automatic lookup resolve it. Read
 ## broad; the CSV is admin-editable (add rows to map new labels).
 [transforms/wearable_activity_map]
 access = read : [ * ], write : [ admin, sc_admin ]
