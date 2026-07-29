@@ -26,6 +26,7 @@ indoor rowing,Rowing,Cardio
 swimming,Swimming,Cardio
 swim,Swimming,Cardio
 open water swimming,Swimming,Cardio
+outdoor swim,Swimming,Cardio
 pool swim,Swimming,Cardio
 strength_training,Strength,Strength
 strength training,Strength,Strength
@@ -39,3 +40,7 @@ stretching,Flexibility,Flexibility
 flexibility,Flexibility,Flexibility
 hiit,HIIT,Cardio
 high intensity interval training,HIIT,Cardio
+stair climbing,Stair Climbing,Cardio
+stair stepper,Stair Climbing,Cardio
+stairs,Stair Climbing,Cardio
+stair_climbing,Stair Climbing,Cardio

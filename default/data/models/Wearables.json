@@ -871,16 +871,6 @@
               "inputField": "workout_activity"
             }
           ],
-          "outputFieldMappings": [
-            {
-              "lookupField": "workout_activity_canon",
-              "outputField": "workout_activity_canon"
-            },
-            {
-              "lookupField": "workout_activity_group",
-              "outputField": "workout_activity_group"
-            }
-          ],
           "outputFields": [
             {
               "fieldName": "workout_activity_canon",

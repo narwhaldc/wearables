@@ -17,7 +17,7 @@
       <title>Ingest freshness — last event per feed (vendor × sourcetype, 30d)</title>
       <table>
         <search>
-          <query>`widx`
+          <query>`widx` NOT sourcetype IN (wearable_registry_backup, wearable_dq_finding)
 | stats count as events_30d latest(_time) as last_epoch by vendor sourcetype
 | eval age_h=round((now()-last_epoch)/3600,1)
 | eval status=case(age_h&lt;=30,"🟢 ok", age_h&lt;=72,"🟡 stale", true(),"🔴 critical")
@@ -41,7 +41,7 @@
       <title>⚠ Stale or silent feeds (&gt; 48h since last event)</title>
       <table>
         <search>
-          <query>`widx`
+          <query>`widx` NOT sourcetype IN (wearable_registry_backup, wearable_dq_finding)
 | stats latest(_time) as last_epoch by vendor sourcetype
 | eval age_h=round((now()-last_epoch)/3600,1)
 | where age_h&gt;48
@@ -61,7 +61,7 @@
       <title>Events missing canonical keys (person_id / vendor, 7d)</title>
       <table>
         <search>
-          <query>`widx`
+          <query>`widx` NOT sourcetype IN (wearable_registry_backup, wearable_dq_finding)
 | where isnull(person_id) OR person_id="" OR isnull(vendor) OR vendor=""
 | eval missing=mvappend(if(isnull(person_id) OR person_id="","person_id",null()), if(isnull(vendor) OR vendor="","vendor",null()))
 | stats count by sourcetype missing
@@ -77,17 +77,18 @@
 
   <row>
     <panel>
-      <title>Unmapped workout activity labels (90d) — add a row to wearable_activity_map.csv</title>
+      <title>Unmapped workout activity labels (all time) — add a row to wearable_activity_map.csv</title>
       <table>
         <search>
           <query>`widx` tag=wearable_workout
 | lookup wearable_activity_map workout_activity OUTPUT workout_activity_canon
 | where isnull(workout_activity_canon)
-| stats count as workouts values(vendor) as vendors by workout_activity
-| eval workouts=tostring(workouts,"commas")
-| rename workout_activity as "raw label (unmapped)"
+| stats count as workouts values(vendor) as vendors latest(_time) as last_epoch by workout_activity
+| eval last_seen=strftime(last_epoch,"%Y-%m-%d"), workouts=tostring(workouts,"commas")
+| fields workout_activity workouts vendors last_seen
+| rename workout_activity as "raw label (unmapped)", last_seen as "last seen"
 | sort - workouts</query>
-          <earliest>-90d</earliest>
+          <earliest>0</earliest>
           <latest>now</latest>
         </search>
         <option name="count">30</option>
@@ -142,7 +143,7 @@
       <title>Daily ingest volume by vendor (30d) — watch for a feed dropping to zero</title>
       <chart>
         <search>
-          <query>`widx`
+          <query>`widx` NOT sourcetype IN (wearable_registry_backup, wearable_dq_finding)
 | timechart span=1d count by vendor</query>
           <earliest>-30d</earliest>
           <latest>now</latest>
