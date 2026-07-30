@@ -1,4 +1,4 @@
-<form version="1.1" theme="dark" stylesheet="wearables_dark.css">
+<form version="1.1" theme="dark">
   <label>Admin: Sample Data</label>
   <description>Create or delete synthetic (synthetic="true") wearable data for testing/demo. Admin-only (Create needs can_collect; Clean up needs can_delete). Pick an Action, set the options, and Submit — you'll be asked to approve the risky command (collect/delete) once per run.</description>
   <fieldset submitButton="true" autoRun="false">
