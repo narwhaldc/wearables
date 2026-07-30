@@ -1339,6 +1339,42 @@
           "editable": true,
           "displayName": "hrv_avg",
           "comment": ""
+        },
+        {
+          "fieldName": "systolic_bp",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "systolic_bp",
+          "comment": ""
+        },
+        {
+          "fieldName": "diastolic_bp",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "diastolic_bp",
+          "comment": ""
+        },
+        {
+          "fieldName": "visceral_fat",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "visceral_fat",
+          "comment": ""
         }
       ],
       "calculations": []
