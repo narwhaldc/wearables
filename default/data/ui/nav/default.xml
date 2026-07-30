@@ -9,6 +9,9 @@
     <view name="wearables_family" label="Overview"/>
     <view name="wearables_family_graph" label="Graph"/>
   </collection>
+  <collection label="Vendors" icon="chart">
+    <view name="wearables_vendor_apple" label="Apple Health"/>
+  </collection>
   <collection label="Admin" icon="bookmark">
     <view name="wearables_admin_people" label="People &amp; Defaults"/>
     <view name="wearables_admin_relationships" label="Relationships"/>
