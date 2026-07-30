@@ -112,6 +112,10 @@
 | eval _raw=replace(_raw,"__DAY__",strftime(_time,"%Y-%m-%d"))
 | eval _raw=replace(_raw,"__SLEEP_START_MS__",tostring(round((_time - 26280)*1000)))
 | eval _raw=replace(_raw,"__SLEEP_END_MS__",tostring(round(_time*1000)))
+| eval _raw=replace(_raw,"__SLEEP_START_S__",tostring(round(_time - 26280)))
+| eval _raw=replace(_raw,"__SLEEP_END_S__",tostring(round(_time)))
+| eval _raw=replace(_raw,"__WK_START_S__",tostring(round(_time)))
+| eval _raw=replace(_raw,"__WK_END_S__",tostring(round(_time + 2100)))
 | fields _raw _time sourcetype
 | collect index=wearables output_format=hec
 | stats count as events by sourcetype
