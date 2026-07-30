@@ -43,6 +43,7 @@
       <choice value="sourcetype=oura:*">Oura only</choice>
       <choice value="sourcetype=garmin:*">Garmin only</choice>
       <choice value="sourcetype=withings:*">Withings only</choice>
+      <choice value="sourcetype=apple:*">Apple / Hume only</choice>
     </input>
     <input type="dropdown" token="create_confirm" searchWhenChanged="false" depends="$mode_create$">
       <label>Confirm create</label>
@@ -70,6 +71,7 @@
       <choice value="oura">Oura only</choice>
       <choice value="garmin">Garmin only</choice>
       <choice value="withings">Withings only</choice>
+      <choice value="hume">Hume (via Apple) only</choice>
     </input>
     <input type="dropdown" token="cleanup_confirm" searchWhenChanged="false" depends="$mode_cleanup$">
       <label>Confirm delete</label>
@@ -87,7 +89,7 @@
           </div>
           <p>Pick an <b>Action</b> above. Only the selected action's options and result appear, and each action runs only on <b>Submit</b> — so a Create submit can never trigger a delete, and vice versa.</p>
           <ul>
-            <li><b>Create</b> replays the shipped <b>wearable_samples.csv</b> (one authentic-shaped event of every Oura, Garmin, and Withings sourcetype — matched to what the fetchers actually collect) into <b>index=wearables</b> via <code>collect output_format=hec</code>, so events pass through the real TA normalization. Stamped <code>synthetic="true"</code> + the chosen <code>person_id</code>, sprayed across the day range. Each Submit adds a batch (re-submitting doubles it; nightly dedup collapses exact copies). Needs <b>can_collect</b>. Requires the explicit <b>Confirm create</b> selection.</li>
+            <li><b>Create</b> replays the shipped <b>wearable_samples.csv</b> (one authentic-shaped event of every Oura, Garmin, Withings, and Apple/Hume sourcetype — matched to what the fetchers actually collect) into <b>index=wearables</b> via <code>collect output_format=hec</code>, so events pass through the real TA normalization. Stamped <code>synthetic="true"</code> + the chosen <code>person_id</code>, sprayed across the day range. Each Submit adds a batch (re-submitting doubles it; nightly dedup collapses exact copies). Needs <b>can_collect</b>. Requires the explicit <b>Confirm create</b> selection.</li>
             <li><b>Clean up</b> deletes synthetic events for the chosen person + vendor scope (All = everything). It runs across <b>all time</b> automatically (no time-picker step), so nothing is left behind. Needs <b>can_delete</b>. Requires the explicit <b>Confirm delete</b> selection.</li>
             <li>Both are Splunk "risky commands" — after Submit, click the <b>⚠ icon</b> on the result panel to review + approve.</li>
           </ul>
