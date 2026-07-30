@@ -1,14 +1,14 @@
 <nav search_view="search" color="#0F1117">
   <view name="wearables_today" default="true" label="Today" icon="chartpanels"/>
-  <collection label="Family" icon="user">
-    <view name="wearables_family" label="Overview"/>
-    <view name="wearables_family_graph" label="Graph"/>
-  </collection>
   <view name="wearables_sleep" label="Sleep" icon="chartgauge"/>
   <view name="wearables_heart" label="Heart Health" icon="pulse"/>
   <view name="wearables_activity" label="Activity" icon="running"/>
   <view name="wearables_wellness" label="Wellness" icon="heart"/>
   <view name="wearables_device" label="Device" icon="gear"/>
+  <collection label="Family" icon="user">
+    <view name="wearables_family" label="Overview"/>
+    <view name="wearables_family_graph" label="Graph"/>
+  </collection>
   <collection label="Admin" icon="bookmark">
     <view name="wearables_admin_people" label="People &amp; Defaults"/>
     <view name="wearables_admin_relationships" label="Relationships"/>
