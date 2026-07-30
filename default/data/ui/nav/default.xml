@@ -11,6 +11,7 @@
   </collection>
   <collection label="Vendors" icon="chart">
     <view name="wearables_vendor_apple" label="Apple Health"/>
+    <view name="wearables_vendor_oura" label="Oura"/>
     <view name="wearables_vendor_withings" label="Withings"/>
   </collection>
   <collection label="Admin" icon="bookmark">
