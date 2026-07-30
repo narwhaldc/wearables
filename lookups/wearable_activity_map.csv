@@ -19,7 +19,9 @@ trail running,Running,Cardio
 treadmill_running,Running,Cardio
 treadmill running,Running,Cardio
 elliptical,Elliptical,Cardio
-cross training,Elliptical,Cardio
+cross training,Cross Training,Cardio
+cross-training,Cross Training,Cardio
+crossTraining,Cross Training,Cardio
 cross trainer,Elliptical,Cardio
 rowing,Rowing,Cardio
 indoor rowing,Rowing,Cardio
@@ -34,8 +36,10 @@ functional strength training,Strength,Strength
 traditional strength training,Strength,Strength
 weight training,Strength,Strength
 core training,Strength,Strength
+strengthTraining,Strength,Strength
 yoga,Yoga,Flexibility
 pilates,Pilates,Flexibility
+breathwork,Breathwork,Mindfulness
 stretching,Flexibility,Flexibility
 flexibility,Flexibility,Flexibility
 hiit,HIIT,Cardio
@@ -44,3 +48,4 @@ stair climbing,Stair Climbing,Cardio
 stair stepper,Stair Climbing,Cardio
 stairs,Stair Climbing,Cardio
 stair_climbing,Stair Climbing,Cardio
+stairExercise,Stair Climbing,Cardio
