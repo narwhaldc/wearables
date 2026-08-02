@@ -79,6 +79,15 @@ internet-facing. Ingest scripts are **repo-only** (never shipped in a `.spl` —
   create a token with access to `index=wearables`. The `hec_url` is
   `<http|https>://<host>:8088/services/collector/event` (scheme must match HEC's SSL setting; on
   Cloud use the dedicated `http-inputs-<stack>.splunkcloud.com:443` host).
+- **Optional — ingest-log index (`wearables_log`):** if you turn on the fetchers' HEC **log mirror**
+  (the `logging` block in each TA's targets file — feeds the **Ingest Health** dashboard), create a
+  **second index** named `wearables_log` (Events), separate from the data index so its **retention
+  can differ** (e.g. 30 days of logs vs years of health data — retention is per-index in Splunk). The
+  dashboards read it through the **`wlogidx` macro** (Settings → Advanced Search → Search macros →
+  `wlogidx`, in this app), defined as `index=wearables_log` — edit that **one line** if you named the
+  index differently (it must match each fetcher target's `logging.hec_logging_index`). Grant the
+  **SAME HEC token(s)** write access to **both** `wearables` and `wearables_log` — one token, two
+  indexes. Logs arrive as `sourcetype=wearables:ingest` (see the TA INSTALLs' "mirror ingest logs" step).
 
 ## 2. Install the apps
 Install (Apps → Install app from file) and **restart Splunk** so custom-viz JS + the data model load:
@@ -122,6 +131,12 @@ roster. These are all **enrichment only** — never the access gate.
 Per-person isolation = a role-level **`srchFilter = person_id="P00x"`** on the indexed `person_id`.
 Full recipe (roles, users, closing the bypasses, verification) is in the app's **`RBAC.md`**
 (deployment config — not shipped in the `.spl`; `authorize.conf` lives in the deployment, not the app).
+> **Scoping the ingest logs too (optional).** The HEC log mirror stamps `person_id` as an **indexed
+> field** on the log events — on per-target lines, and on run-level lines only when a run is a single
+> person (multi-person aggregator runs keep run-level lines admin-only, so aggregate totals aren't
+> leaked). To let a self-managing user see their **own** ingest health, give the per-person role's
+> `srchFilter` access to the `wearables_log` index as well (same `person_id="P00x"` key). Leave it
+> off and the ingest logs stay admin-only.
 
 ## Privacy — PII / PHI
 The platform keeps identifying data minimal and gates health data (PHI) by access control.
