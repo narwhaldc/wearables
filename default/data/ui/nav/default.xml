@@ -20,6 +20,7 @@
     <view name="wearables_admin_relationships" label="Relationships"/>
     <view name="wearables_admin_sampledata" label="Sample Data"/>
     <view name="wearables_admin_dataquality" label="Ingest &amp; Data Quality"/>
+    <view name="wearables_admin_ingesthealth" label="Ingest Health"/>
     <view name="wearables_admin_datamapping" label="Data Mapping"/>
     <view name="wearables_overview" label="Overview &amp; Quick Start"/>
   </collection>
