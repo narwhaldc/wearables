@@ -394,6 +394,18 @@
           "editable": true,
           "displayName": "bpm",
           "comment": ""
+        },
+        {
+          "fieldName": "hrv_ms",
+          "owner": "HeartRate",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "hrv_ms (intraday RMSSD/SDNN)",
+          "comment": ""
         }
       ],
       "calculations": []
@@ -879,6 +891,30 @@
           "hidden": false,
           "editable": true,
           "displayName": "workout_activity_group (Cardio/Strength/Flexibility)",
+          "comment": ""
+        },
+        {
+          "fieldName": "workout_avg_hr",
+          "owner": "Workout",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "workout_avg_hr",
+          "comment": ""
+        },
+        {
+          "fieldName": "workout_duration_s",
+          "owner": "Workout",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "workout_duration_s",
           "comment": ""
         }
       ],
@@ -1374,6 +1410,18 @@
           "hidden": false,
           "editable": true,
           "displayName": "visceral_fat",
+          "comment": ""
+        },
+        {
+          "fieldName": "resting_hr",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "resting_hr (daily resting heart rate)",
           "comment": ""
         }
       ],

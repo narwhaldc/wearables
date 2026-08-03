@@ -7,8 +7,9 @@ in that add-on's own INSTALL:
 - Garmin ingest → **[TA-garmin/INSTALL.md](https://github.com/narwhaldc/TA-garmin/blob/main/INSTALL.md)**
 - Withings ingest → **[TA-withings/INSTALL.md](https://github.com/narwhaldc/TA-withings/blob/main/INSTALL.md)**
 - Apple Health ingest → **[TA-apple/INSTALL.md](https://github.com/narwhaldc/TA-apple/blob/main/INSTALL.md)** (Health Auto Export → cloud file-drop → puller; covers Apple Watch + anything in HealthKit)
+- Google Health ingest → **[TA-google/INSTALL.md](https://github.com/narwhaldc/TA-google/blob/main/INSTALL.md)** (OAuth cloud pull; cross-vendor aggregator + universal on-ramp — Apple/Android/Fitbit via one API)
 
-**App version:** wearables 0.2.81 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.2.82 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 

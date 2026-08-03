@@ -117,12 +117,12 @@
 
   <row>
     <panel>
-      <title>Cross-pipeline double-representation (30d) — same person·vendor·day·domain ingested BOTH directly and via the Apple relay</title>
+      <title>Cross-pipeline double-representation (30d) — same person·vendor·day·domain ingested BOTH directly and via the Apple or Google relay</title>
       <table>
         <search>
           <query>`widx` (sourcetype=*sleep* OR sourcetype=*body* OR sourcetype=*bodycomp*)
 | eval domain=if(match(sourcetype,"sleep"),"sleep","bodycomp")
-| eval pipe=if(match(sourcetype,"^apple:"),"apple-relay","direct")
+| eval pipe=case(match(sourcetype,"^apple:"),"apple-relay", match(sourcetype,"^google:"),"google-relay", true(),"direct")
 | stats dc(pipe) as n_pipes values(pipe) as pipes values(sourcetype) as sourcetypes by person_id vendor day domain
 | where n_pipes&gt;1
 | eval sourcetypes=mvjoin(sourcetypes," + ")
