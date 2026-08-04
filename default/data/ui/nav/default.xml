@@ -12,6 +12,7 @@
   <collection label="Vendors" icon="chart">
     <view name="wearables_vendor_apple" label="Apple Health"/>
     <view name="wearables_vendor_garmin" label="Garmin"/>
+    <view name="wearables_vendor_google" label="Google"/>
     <view name="wearables_vendor_oura" label="Oura"/>
     <view name="wearables_vendor_withings" label="Withings"/>
   </collection>
