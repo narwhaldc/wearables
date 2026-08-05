@@ -55,10 +55,17 @@ The platform keeps identifying data minimal and gates health data (PHI) by acces
 
 ## Searching your data — macros
 Ad-hoc searches (the **Search** app, custom panels, alerts) can use these exported macros:
-- **`` `widx` ``** — expands to `index=wearables` (the single deployment knob for the data index).
-  Start ad-hoc searches with `` `widx` `` so they follow any index rename.
-- **`` `wlogidx` ``** — `index=wearables_log` (the optional ingest-log mirror that powers the
-  **Ingest Health** dashboard).
+- **`` `widx` ``** — expands to `index=wearables`, and is the **single deployment knob for the data
+  index**. If an admin keeps wearables data in a **different index** (site naming standards, a shared
+  index, retention tiers, etc.), point the *entire app* at it by editing that one macro definition
+  (`default/macros.conf` → `[widx]`, e.g. `definition = index=health_wearables`) — every dashboard
+  reads through `` `widx` ``, so nothing else needs touching. Start ad-hoc searches with `` `widx` ``
+  too so they follow the same setting.
+- **`` `wlogidx` ``** — expands to `index=wearables_log` (the optional ingest-log mirror that powers
+  the **Ingest Health** dashboard). Same one-line knob: edit `[wlogidx]` to relocate the log index.
+  It's kept **separate from the data index on purpose** so log retention can differ (e.g. ~30-day
+  logs vs years of health data — retention is per-index in Splunk); if you rename it, also match each
+  fetcher target's `logging.hec_logging_index`.
 - **`` `withnames` ``** — resolves the opaque **`person_id`** to the readable **`person_name`**
   (falls back to `person_id` when a person isn't in the registry). Use it whenever you want names
   instead of `P00x`:
