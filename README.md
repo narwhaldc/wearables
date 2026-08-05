@@ -24,6 +24,8 @@ Quick start + all repo links are on the in-app **Overview** page. Per-vendor ing
   `wearable_identity_map`. Admin/sc_admin write-locked; survive app upgrades (unlike shipped CSVs).
 - `default/savedsearches.conf` — index dedup maintenance (+1h after oura_health) + a nightly
   registry backup to the index.
+- `default/macros.conf` — search macros (see *Searching your data* below): `` `widx` `` / `` `wlogidx` ``
+  (index knobs), `` `withnames` `` (person_id→name), `` `dedup_workouts` `` (cross-vendor session dedup).
 
 ## Requirements
 - **`index=wearables`** (Settings → Indexes / ACS).
@@ -50,6 +52,24 @@ The platform keeps identifying data minimal and gates health data (PHI) by acces
   users (hence the temporary Person picker); production must set the srchFilter roles.
 - **Nothing sensitive ships in a package.** Every `.spl` passes an automated PII/secret scan before
   release; only synthetic (`synthetic="true"`) sample data is included.
+
+## Searching your data — macros
+Ad-hoc searches (the **Search** app, custom panels, alerts) can use these exported macros:
+- **`` `widx` ``** — expands to `index=wearables` (the single deployment knob for the data index).
+  Start ad-hoc searches with `` `widx` `` so they follow any index rename.
+- **`` `wlogidx` ``** — `index=wearables_log` (the optional ingest-log mirror that powers the
+  **Ingest Health** dashboard).
+- **`` `withnames` ``** — resolves the opaque **`person_id`** to the readable **`person_name`**
+  (falls back to `person_id` when a person isn't in the registry). Use it whenever you want names
+  instead of `P00x`:
+  ```
+  `widx` | `withnames` | timechart count by person_name
+  ```
+  It is an **opt-in macro, not an automatic lookup, by design** — a global auto-lookup would run
+  per-event on *every* wearables search/dashboard/alert (a universal cost) even when names aren't
+  needed; the macro confines that lookup to the one search that actually wants them.
+- **`` `dedup_workouts` ``** — collapses the same physical workout logged by more than one vendor
+  into a single session row (search-time only; raw events are never touched).
 
 ## Scheduled maintenance
 `default/savedsearches.conf` ships a two-pass **index dedup** for `index=wearables` (tag duplicates
