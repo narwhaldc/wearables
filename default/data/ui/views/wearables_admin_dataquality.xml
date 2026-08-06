@@ -101,6 +101,8 @@
       <table>
         <search>
           <query>`widx` sourcetype=apple:extra
+| eventstats max(count) as _mc by metric day
+| where count=_mc
 | stats sum(count) as samples dc(day) as days values(vendor) as vendors by metric
 | eval samples=tostring(samples,"commas")
 | rename metric as "apple metric (unmapped)"
