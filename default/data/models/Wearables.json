@@ -1413,6 +1413,78 @@
           "comment": ""
         },
         {
+          "fieldName": "lean_mass_kg",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "lean_mass_kg",
+          "comment": ""
+        },
+        {
+          "fieldName": "fat_mass_kg",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "fat_mass_kg",
+          "comment": ""
+        },
+        {
+          "fieldName": "muscle_mass_kg",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "muscle_mass_kg",
+          "comment": ""
+        },
+        {
+          "fieldName": "bone_mass_kg",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "bone_mass_kg",
+          "comment": ""
+        },
+        {
+          "fieldName": "body_water_kg",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "body_water_kg",
+          "comment": ""
+        },
+        {
+          "fieldName": "body_water_pct",
+          "owner": "Daily",
+          "type": "number",
+          "fieldSearch": "",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "body_water_pct",
+          "comment": ""
+        },
+        {
           "fieldName": "resting_hr",
           "owner": "Daily",
           "type": "number",
@@ -1484,7 +1556,7 @@
           "multivalue": false,
           "hidden": false,
           "editable": true,
-          "displayName": "device_id (vendor:vendor_user_id \u2014 view filter, not RBAC)",
+          "displayName": "device_id (vendor:vendor_user_id — view filter, not RBAC)",
           "comment": ""
         },
         {
