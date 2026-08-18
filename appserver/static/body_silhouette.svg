@@ -1,0 +1,21 @@
+<svg viewBox="0 0 240 520" width="240" height="520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Body composition figure">
+  <!-- Neutral front-facing human silhouette. Transparent background; light stroke +
+       faint fill so it reads on the Dashboard Studio dark theme. Whole-body only —
+       deliberately NOT segmented (we have no per-limb data). Narrower torso + tucked
+       arms give side callouts clean margin; parallel legs with a small gap; a pelvis
+       gap between torso and legs leaves room for one floating data callout. -->
+  <g fill="rgba(126,168,210,0.13)" stroke="#8fa3bd" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+    <!-- legs: parallel, slight separation, detached below the torso (pelvis gap) -->
+    <rect x="95"  y="224" width="18" height="206" rx="10"/>
+    <rect x="127" y="224" width="18" height="206" rx="10"/>
+    <!-- arms: tucked in, gentle splay -->
+    <rect x="60"  y="96" width="18" height="150" rx="9" transform="rotate(4 68 98)"/>
+    <rect x="162" y="96" width="18" height="150" rx="9" transform="rotate(-4 172 98)"/>
+    <!-- torso: narrower; ends ~y191, leaving the pelvis gap above the legs -->
+    <path d="M93 90 h54 a11 11 0 0 1 11 11 l3 74 a14 14 0 0 1 -14 14 h-54 a14 14 0 0 1 -14 -14 l3 -74 a11 11 0 0 1 11 -11 z"/>
+    <!-- neck -->
+    <rect x="110" y="68" width="20" height="18" rx="8"/>
+    <!-- head -->
+    <circle cx="120" cy="42" r="28"/>
+  </g>
+</svg>
