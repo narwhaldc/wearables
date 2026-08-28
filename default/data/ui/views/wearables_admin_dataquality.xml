@@ -1,4 +1,4 @@
-<dashboard version="1.1" theme="dark">
+<form version="1.1" theme="dark">
   <label>Admin: Ingest &amp; Data Quality</label>
   <description>Operational health of the Wearables pipeline: per-feed freshness, cross-pipeline double-representation, unmapped activity labels + Apple metrics, and missing canonical fields. Read-only diagnostics — pairs with the "Wearables Data Quality — Monitor" scheduled search.</description>
 
@@ -157,4 +157,42 @@
       </chart>
     </panel>
   </row>
-</dashboard>
+
+  <row>
+    <panel>
+      <title>Duplicate events summary (all time)</title>
+      <table>
+        <search>
+          <query>`widx`
+| stats count as total_events dc(_raw) as unique_events
+| eval dup_events=total_events-unique_events
+| eval dup_pct=round(dup_events/total_events*100,2)
+| eval total_events=tostring(total_events,"commas"), unique_events=tostring(unique_events,"commas"), dup_events=tostring(dup_events,"commas")
+| table total_events unique_events dup_events dup_pct
+| rename total_events as "total events", unique_events as "unique events (by _raw)", dup_events as "duplicate events", dup_pct as "duplicate %"</query>
+          <earliest>0</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="wrap">false</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Duplicate events by month (all time) — same _raw content ingested more than once; uses dc(_raw), safe at All Time unlike streamstats/dedup</title>
+      <chart>
+        <search>
+          <query>`widx`
+| timechart span=1mon count as total_events dc(_raw) as unique_events
+| eval dup_events=total_events-unique_events
+| fields _time dup_events</query>
+          <earliest>0</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+      </chart>
+    </panel>
+  </row>
+</form>

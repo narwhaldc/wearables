@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="2640" viewBox="0 0 1440 2640" preserveAspectRatio="xMidYMid slice">
+<rect width="1440" height="2640" fill="#0F1117"/>
+
+<!-- ============ TOP ARCH (upper-right, centered 1180,480) ============ -->
+<circle cx="1180" cy="480" r="580" fill="none" stroke="#7B56DB" stroke-width="0.8" opacity="0.12"/>
+<circle cx="1180" cy="480" r="480" fill="none" stroke="#7B56DB" stroke-width="0.8" opacity="0.10"/>
+<circle cx="1180" cy="480" r="380" fill="none" stroke="#009CEB" stroke-width="0.8" opacity="0.10"/>
+<circle cx="1180" cy="480" r="280" fill="none" stroke="#009CEB" stroke-width="0.8" opacity="0.09"/>
+<circle cx="1180" cy="480" r="180" fill="none" stroke="#00CDAF" stroke-width="0.8" opacity="0.10"/>
+<circle cx="1180" cy="480" r="90"  fill="none" stroke="#DD9900" stroke-width="0.8" opacity="0.10"/>
+<circle cx="1180" cy="480" r="580" fill="none" stroke="#7B56DB" stroke-width="36" stroke-dasharray="2748 914"  stroke-dashoffset="0"   opacity="0.14" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="480" fill="none" stroke="#009CEB" stroke-width="28" stroke-dasharray="2010 1002" stroke-dashoffset="400" opacity="0.16" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="380" fill="none" stroke="#00CDAF" stroke-width="22" stroke-dasharray="1440 950"  stroke-dashoffset="200" opacity="0.15" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="280" fill="none" stroke="#DD9900" stroke-width="16" stroke-dasharray="960 798"   stroke-dashoffset="120" opacity="0.14" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="180" fill="none" stroke="#7B56DB" stroke-width="12" stroke-dasharray="640 490"   stroke-dashoffset="80"  opacity="0.16" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="90"  fill="none" stroke="#00CDAF" stroke-width="8"  stroke-dasharray="340 225"   stroke-dashoffset="40"  opacity="0.18" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="42" fill="#1A1D2E" stroke="#7B56DB" stroke-width="1.5" opacity="0.7"/>
+<circle cx="1180" cy="480" r="26" fill="#7B56DB" opacity="0.18"/>
+<circle cx="1180" cy="480" r="12" fill="#7B56DB" opacity="0.45"/>
+
+<!-- ============ BOTTOM ARCH (lower-left, mirrored to centered 260,2160) ============ -->
+<g transform="translate(-920,1680)">
+<circle cx="1180" cy="480" r="580" fill="none" stroke="#00CDAF" stroke-width="0.8" opacity="0.12"/>
+<circle cx="1180" cy="480" r="480" fill="none" stroke="#009CEB" stroke-width="0.8" opacity="0.10"/>
+<circle cx="1180" cy="480" r="380" fill="none" stroke="#7B56DB" stroke-width="0.8" opacity="0.10"/>
+<circle cx="1180" cy="480" r="280" fill="none" stroke="#009CEB" stroke-width="0.8" opacity="0.09"/>
+<circle cx="1180" cy="480" r="180" fill="none" stroke="#DD9900" stroke-width="0.8" opacity="0.10"/>
+<circle cx="1180" cy="480" r="90"  fill="none" stroke="#00CDAF" stroke-width="0.8" opacity="0.10"/>
+<circle cx="1180" cy="480" r="580" fill="none" stroke="#00CDAF" stroke-width="36" stroke-dasharray="2010 1652" stroke-dashoffset="300" opacity="0.14" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="480" fill="none" stroke="#009CEB" stroke-width="28" stroke-dasharray="2010 1002" stroke-dashoffset="900" opacity="0.16" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="380" fill="none" stroke="#7B56DB" stroke-width="22" stroke-dasharray="1440 950"  stroke-dashoffset="600" opacity="0.15" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="280" fill="none" stroke="#DD9900" stroke-width="16" stroke-dasharray="960 798"   stroke-dashoffset="320" opacity="0.14" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="180" fill="none" stroke="#00CDAF" stroke-width="12" stroke-dasharray="640 490"   stroke-dashoffset="180" opacity="0.16" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="90"  fill="none" stroke="#7B56DB" stroke-width="8"  stroke-dasharray="340 225"   stroke-dashoffset="90"  opacity="0.18" stroke-linecap="round"/>
+<circle cx="1180" cy="480" r="42" fill="#1A1D2E" stroke="#00CDAF" stroke-width="1.5" opacity="0.7"/>
+<circle cx="1180" cy="480" r="26" fill="#00CDAF" opacity="0.18"/>
+<circle cx="1180" cy="480" r="12" fill="#00CDAF" opacity="0.45"/>
+</g>
+
+<!-- (ECG/heartbeat traces + scattered dots intentionally omitted — a fake line
+     chart or stray dots could be misread as real Splunk data next to the panels.) -->
+</svg>
