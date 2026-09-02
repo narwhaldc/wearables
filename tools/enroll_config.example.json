@@ -1,0 +1,37 @@
+{
+  "_comment": "Copy to enroll_config.json (gitignored) and fill in real values. One block per Splunk instance you provision people onto. primary_instance is authoritative for person_id assignment — every other instance reuses that same id for the same person, so it must NOT be computed independently per instance.",
+  "primary_instance": "home",
+  "instances": {
+    "home": {
+      "_comment": "management_url is the Splunk REST management port (8089), not Splunk Web (8000).",
+      "_comment_backend": "backend chooses how create_role()/create_hec_token() talk to this instance. 'rest' = standard Splunk Enterprise management REST (self-managed, and any Cloud endpoints that happen to be reachable that way). 'acs' = Splunk Cloud's Admin Config Service (a SEPARATE API on admin.splunk.com, not the stack's own management port) — required for Cloud because role/HEC-token creation are reserved for Splunk-side Cloud admin operations, not exposed to sc_admin via plain REST. Verified against Splunk's own ACS docs 2026-09-01, not guessed. Set explicitly per instance — never auto-detected.",
+      "backend": "rest",
+      "management_url": "https://splunk:8089",
+      "_comment_auth_token": "A SCOPED Splunk authentication token (Settings > Tokens), NOT a raw admin password. Needs capabilities to create roles, create HEC inputs, and run search jobs. This is the more sensitive of the two credentials below — never commit this file.",
+      "auth_token": "PASTE-SCOPED-AUTH-TOKEN-HERE",
+      "verify_ssl": false,
+      "_comment_credentials_hec": "A DEDICATED, admin-only HEC token restricted to write-only access into credentials_index. Never hand this one to any enrolled person — it is separate from the per-person token this tool creates for them.",
+      "credentials_hec_url": "https://splunk:8088/services/collector/event",
+      "credentials_hec_token": "PASTE-ADMIN-ONLY-INJECTOR-HEC-TOKEN-HERE",
+      "credentials_index": "wearables_credentials",
+      "_comment_data_hec_url": "The URL a PERSON's own fetcher/phone app will POST to — this is what gets embedded in their enrollment QR. On Splunk Cloud this hostname differs from the search-head hostname AND differs by cloud provider (AWS: http-inputs-<host>, hyphen; GCP: http-inputs.<host>, dot).",
+      "data_hec_url": "https://splunk:8088/services/collector/event",
+      "data_index": "wearables",
+      "log_index": "wearables_log"
+    },
+    "cloud": {
+      "backend": "acs",
+      "_comment_acs_base_url": "ACS lives on admin.splunk.com, NOT <stack>.splunkcloud.com — a completely different hostname than management_url. management_url is still needed on this instance too, since search-job dispatch (get_next_person_id/add_profile_row) goes through the normal stack REST endpoint, not ACS.",
+      "acs_base_url": "https://admin.splunk.com/<stack>",
+      "management_url": "https://<stack>.splunkcloud.com:8089",
+      "auth_token": "PASTE-SCOPED-AUTH-TOKEN-HERE",
+      "verify_ssl": true,
+      "credentials_hec_url": "https://http-inputs-<stack>.splunkcloud.com:443/services/collector/event",
+      "credentials_hec_token": "PASTE-ADMIN-ONLY-INJECTOR-HEC-TOKEN-HERE",
+      "credentials_index": "wearables_credentials",
+      "data_hec_url": "https://http-inputs-<stack>.splunkcloud.com:443/services/collector/event",
+      "data_index": "wearables",
+      "log_index": "wearables_log"
+    }
+  }
+}

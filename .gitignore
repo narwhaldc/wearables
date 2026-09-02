@@ -9,3 +9,19 @@ dist/
 *.swo
 .*.sw?
 *~
+
+# enrollment tool creds (repo-only; carries a scoped admin auth token — NEVER commit)
+# NOTE: bare name matches at ANY depth; the **/ form is explicit belt-and-suspenders.
+enroll_config.json
+**/enroll_config.json
+
+# master_fetcher operational state (pure timestamps, no secret — just shouldn't be
+# version-controlled, same category as each TA's own checkpoint/dedup files)
+master_fetcher_state.json
+**/master_fetcher_state.json
+
+# per-instance Splunk login credential store for the future --login bootstrap
+# (not built yet, but WILL carry a real scoped auth token per instance —
+# gitignored proactively so there's no window where it could land un-excluded)
+splunk_instances.json
+**/splunk_instances.json

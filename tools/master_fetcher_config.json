@@ -1,0 +1,8 @@
+{
+  "_comment": "Per-vendor sync cadence for master_fetcher.py. Copy to master_fetcher_config.json (gitignored is not required -- no secrets here, but keep it alongside for consistency). Intervals ported from each vendor's PRE-EXISTING standalone cron schedule, not newly chosen -- see wearables-roadmap.md for why each one is what it is (Garmin's hourly cadence in particular exists to avoid a known 429 rate-limit on Garmin's login endpoint).",
+  "oura":     {"interval_minutes": 10,  "_comment": "matches its old */10 cron; OAuth2, low rate-limit risk"},
+  "garmin":   {"interval_minutes": 60,  "_comment": "matches its old hourly cron; avoids Garmin's login-endpoint 429"},
+  "withings": {"interval_minutes": 60,  "_comment": "matches its old hourly cron"},
+  "apple":    {"interval_minutes": 15,  "_comment": "matches its old */15 cron; really governs how often to check for new HAE/rclone drops"},
+  "google":   {"interval_minutes": 240, "_comment": "matches its old every-4h cron; heavy page-streamed pull, avoid over-calling"}
+}
