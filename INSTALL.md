@@ -9,7 +9,7 @@ in that add-on's own INSTALL:
 - Apple Health ingest → **[TA-apple/INSTALL.md](https://github.com/narwhaldc/TA-apple/blob/main/INSTALL.md)** (Health Auto Export → cloud file-drop → puller; covers Apple Watch + anything in HealthKit)
 - Google Health ingest → **[TA-google/INSTALL.md](https://github.com/narwhaldc/TA-google/blob/main/INSTALL.md)** (OAuth cloud pull; cross-vendor aggregator + universal on-ramp — Apple/Android/Fitbit via one API)
 
-**App version:** wearables 0.3.68 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.3.83 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -127,6 +127,16 @@ fetchers stamp `person_id` directly). `wearable_relationships` (viewer_splunk_us
 relationship, can_view; edit via Admin → Relationships) records family **caregiver→dependent** edges — the source for generating a
 caregiver's per-person roles (see [RBAC.md](RBAC.md) → *Family / caregiver access*) and the **Family**
 roster. These are all **enrichment only** — never the access gate.
+
+### Medications tab reference lookup (optional, admin-curated)
+The **Medications** tab (opt-in, see TA-apple's `optional_includes`) lets a user click a medication
+to drill into dose history plus a short reference blurb and a "look up on WebMD" link (opens in a
+new tab so the dashboard's nav/state is untouched). The blurb comes from `medication_reference.csv`
+(CSV lookup, like `wearable_activity_map.csv` — not KV Store, since it's free-text reference content
+with no per-person data). It ships **empty** (header only): `medication_name,description,uses,side_effects`.
+Add a row per medication as real data shows up — `medication_name` must match the value Health Auto
+Export sends (its `displayText`). No row yet → the reference panel simply stays hidden; dose history
+and the WebMD link still work without it.
 
 ## 5. Multi-user RBAC
 Per-person isolation = a role-level **`srchFilter = person_id="P00x"`** on the indexed `person_id`.
