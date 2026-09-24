@@ -9,7 +9,7 @@ in that add-on's own INSTALL:
 - Apple Health ingest → **[TA-apple/INSTALL.md](https://github.com/narwhaldc/TA-apple/blob/main/INSTALL.md)** (Health Auto Export → cloud file-drop → puller; covers Apple Watch + anything in HealthKit)
 - Google Health ingest → **[TA-google/INSTALL.md](https://github.com/narwhaldc/TA-google/blob/main/INSTALL.md)** (OAuth cloud pull; cross-vendor aggregator + universal on-ramp — Apple/Android/Fitbit/Samsung via one API; Samsung specifically needs two Android-side bridges enabled first, see that guide)
 
-**App version:** wearables 0.3.93 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.3.94 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
