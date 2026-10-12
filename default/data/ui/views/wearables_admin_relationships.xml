@@ -12,6 +12,12 @@
     <set token="sel_r_can"></set>
     <set token="rr_key"></set>
     <set token="mode_rmanage">1</set>
+    <!-- Explicitly cleared (not left to the raction dropdown's own default),
+         same fix as wearables_admin_people.xml: a lingering mode_rremove=1 from
+         an earlier "Remove a relationship" selection, carried over via URL/
+         session state, could keep the Remove row's depends condition satisfied
+         even while this page displays Add/Edit mode. -->
+    <unset token="mode_rremove"></unset>
     <set token="rel_refresh"></set>
     <!-- Confirmations must be re-selected for every write/remove: clear on load,
          action switch, roster row-click, and when the viewer/person/relationship

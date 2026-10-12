@@ -26,6 +26,14 @@
     <set token="sel_p_household"></set>
     <set token="r_id"></set>
     <set token="mode_manage">1</set>
+    <!-- Explicitly cleared, not just left to the paction dropdown's own default.
+         If the page loads from a URL/session that still carries mode_remove=1
+         from an earlier "Remove a person" selection (confirmed happening on
+         Splunk Cloud 10.5.2605.11: the URL can carry form.paction=manage while
+         mode_remove lingers from before), the Remove row's depends condition
+         could stay satisfied even while this page displays Add/Edit mode,
+         exposing its outputlookup to the risky-command pre-check on load. -->
+    <unset token="mode_remove"></unset>
     <set token="roster_refresh"></set>
     <!-- Confirmations must be re-selected for every write/remove. These tokens
          are cleared here (load), on action switch, on row-click, and on picking a

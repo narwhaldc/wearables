@@ -1,6 +1,15 @@
 <form version="1.1" theme="dark">
   <label>Admin: Sample Data</label>
   <description>Create or delete synthetic (synthetic="true") wearable data for testing/demo. Admin-only (Create needs can_collect; Clean up needs can_delete). Pick an Action, set the options, and Submit — you'll be asked to approve the risky command (collect/delete) once per run.</description>
+  <init>
+    <!-- Explicitly clear both modes on every load, same fix as
+         wearables_admin_people.xml / wearables_admin_relationships.xml: without
+         this, a lingering mode_cleanup=1 from an earlier "Clean up" selection,
+         carried over via URL/session state, could leave the destructive delete
+         panel's depends condition satisfied even while "Create" is displayed. -->
+    <unset token="mode_create"></unset>
+    <unset token="mode_cleanup"></unset>
+  </init>
   <fieldset submitButton="true" autoRun="false">
     <input type="dropdown" token="action" searchWhenChanged="true">
       <label>Action</label>
