@@ -73,6 +73,7 @@
       <choice value="garmin">Garmin only</choice>
       <choice value="withings">Withings only</choice>
       <choice value="hume">Hume (via Apple) only</choice>
+      <choice value="cronometer">Cronometer (via Apple) only</choice>
       <choice value="google">Google only</choice>
     </input>
     <input type="dropdown" token="cleanup_confirm" searchWhenChanged="false" depends="$mode_cleanup$">
