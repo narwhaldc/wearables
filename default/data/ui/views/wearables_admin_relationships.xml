@@ -22,8 +22,8 @@
     <!-- Confirmations must be re-selected for every write/remove: clear on load,
          action switch, roster row-click, and when the viewer/person/relationship
          changes (same fix as the People manager). -->
-    <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
-    <unset token="rrem_confirm"></unset><unset token="do_rremove"></unset>
+    <unset token="rel_confirm"></unset>
+    <unset token="rrem_confirm"></unset>
   </init>
   <fieldset submitButton="true" autoRun="false">
     <input type="dropdown" token="raction" searchWhenChanged="true">
@@ -35,14 +35,14 @@
         <condition value="manage">
           <set token="mode_rmanage">1</set>
           <unset token="mode_rremove"></unset>
-          <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
-          <unset token="rrem_confirm"></unset><unset token="do_rremove"></unset>
+          <unset token="rel_confirm"></unset>
+          <unset token="rrem_confirm"></unset>
         </condition>
         <condition value="remove">
           <set token="mode_rremove">1</set>
           <unset token="mode_rmanage"></unset>
-          <unset token="rel_confirm"></unset><unset token="do_rwrite"></unset>
-          <unset token="rrem_confirm"></unset><unset token="do_rremove"></unset>
+          <unset token="rel_confirm"></unset>
+          <unset token="rrem_confirm"></unset>
         </condition>
       </change>
     </input>
@@ -98,15 +98,16 @@
       <choice value="false">false — record relationship only</choice>
       <default>$sel_r_can$</default>
     </input>
+    <!-- No do_rwrite side-channel change handler (fixed 2026-10-12, same bug as
+         wearables_admin_people.xml): a change-set token fires immediately on
+         selection, bypassing the hold-until-Submit deferral this input's own
+         token otherwise gets from searchWhenChanged=false. The write row below
+         depends only on mode_rmanage and reads $rel_confirm$ directly. -->
     <input type="dropdown" token="rel_confirm" searchWhenChanged="false" depends="$mode_rmanage$">
       <label>Confirm write</label>
       <choice value="no">No — do not write</choice>
       <choice value="yes">Yes — write this relationship</choice>
       <default>no</default>
-      <change>
-        <condition value="yes"><set token="do_rwrite">1</set></condition>
-        <condition value="no"><unset token="do_rwrite"></unset></condition>
-      </change>
     </input>
     <!-- REMOVE inputs -->
     <input type="dropdown" token="rr_key" searchWhenChanged="false" depends="$mode_rremove$">
@@ -124,18 +125,15 @@
         <latest>now</latest>
       </search>
       <change>
-        <set token="rrem_confirm">no</set><unset token="do_rremove"></unset>
+        <set token="rrem_confirm">no</set>
       </change>
     </input>
+    <!-- No do_rremove side-channel change handler, same fix as rel_confirm above. -->
     <input type="dropdown" token="rrem_confirm" searchWhenChanged="false" depends="$mode_rremove$">
       <label>Confirm remove</label>
       <choice value="no">No — do not remove</choice>
       <choice value="yes">Yes — permanently remove this relationship</choice>
       <default>no</default>
-      <change>
-        <condition value="yes"><set token="do_rremove">1</set></condition>
-        <condition value="no"><unset token="do_rremove"></unset></condition>
-      </change>
     </input>
   </fieldset>
 
@@ -144,7 +142,7 @@
       <html>
         <div style="padding:8px 4px; line-height:1.5">
           <div style="border:2px solid #F4A422; background:rgba(244,164,34,0.12); border-radius:6px; padding:12px 14px; margin-bottom:14px; color:#F4A422; font-weight:600">
-            ⚠ Splunk may show a small <b>"potential security risk"</b> dialog (it approves the <code>outputlookup</code> command) — sometimes right when this page loads, sometimes after you click <b>Submit</b>, depending on the Splunk build. On the dark theme it is easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b>. Approving it does <b>not</b> write anything by itself; nothing is actually written until you finish the fields (including <b>Confirm</b>), click <b>Submit</b>, and approve.
+            ⚠ Splunk may show a small <b>"potential security risk"</b> dialog (it approves the <code>outputlookup</code> command) — it can appear when this page loads, when you click a roster row, or after you click <b>Submit</b>; which one varies by Splunk build. It's safe to <b>Cancel</b> or close it any time it isn't what you expect — this dialog only ever approves a command running, it never itself writes anything. On the dark theme it is easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed when you do want to continue. Nothing is actually written to the registry until you finish the fields (including <b>Confirm</b>), click <b>Submit</b>, and approve.
           </div>
           <p>This page maintains the <b>wearable_relationships</b> registry (KV Store) — the caregiver→dependent edges that power the <b>Family Graph</b> and are the source for generating each viewer's per-person RBAC roles. Writes are locked to <b>admin/sc_admin</b>.</p>
           <ul>
@@ -179,7 +177,7 @@
         <drilldown>
           <set token="raction">manage</set>
           <unset token="mode_rremove"></unset>
-          <set token="rel_confirm">no</set><unset token="do_rwrite"></unset>
+          <set token="rel_confirm">no</set>
           <set token="sel_r_viewer"></set>
           <set token="sel_r_person"></set>
           <set token="sel_r_rel"></set>
@@ -209,7 +207,7 @@
     </panel>
   </row>
 
-  <row depends="$mode_rmanage$ $do_rwrite$">
+  <row depends="$mode_rmanage$">
     <panel>
       <title>Add / Edit result — $r_viewer$ → $r_person$</title>
       <table>
@@ -248,15 +246,21 @@
     </panel>
   </row>
 
-  <row depends="$mode_rremove$ $do_rremove$">
+  <row depends="$mode_rremove$">
     <panel>
       <title>Removed relationship</title>
       <table>
         <search>
-          <query>| inputlookup wearable_relationships
-| where _key!="$rr_key$"
-| outputlookup wearable_relationships
-| stats count as relationships_remaining</query>
+          <!-- Same fix as wearables_admin_people.xml's remove row: a bare
+               outputlookup here would WIPE the entire collection if it ever
+               dispatched with zero input rows (no append=t safety net), so the
+               go/no-go decision is its own real search stage; inputlookup and
+               outputlookup only exist inside a map branch that never executes
+               at all when go=0. -->
+          <query>| makeresults
+| eval go=if("$rrem_confirm$"=="yes" AND "$rr_key$"!="", 1, 0)
+| where go=1
+| map maxsearches=1 search="| inputlookup wearable_relationships | where _key!=\"$rr_key$\" | outputlookup wearable_relationships | stats count as relationships_remaining"</query>
           <earliest>-1m</earliest>
           <latest>now</latest>
           <done>

@@ -147,14 +147,24 @@
     </panel>
   </row>
 
-  <row depends="$mode_cleanup$ $cleanup_person$ $cleanup_vendor$ $cleanup_confirm$">
+  <row depends="$mode_cleanup$">
     <panel>
       <title>Deleted synthetic: person=$cleanup_person$ · vendor=$cleanup_vendor$ (all time)</title>
       <table>
         <search>
-          <query>`widx` synthetic="true" person_id="$cleanup_person$" vendor="$cleanup_vendor$"
-| delete
-| stats sum(deleted) as records_deleted, sum(errors) as errors</query>
+          <!-- Confirmed 2026-10-12 (same root cause fixed on the People/
+               Relationships admin pages): a depends-gated row can dispatch its
+               search on Splunk Cloud before Submit is physically clicked, and
+               this one has no in-query confirm check at all; delete has no
+               append=t-style safe no-op, so an unconfirmed early dispatch would
+               just straightforwardly delete whatever person/vendor happen to be
+               selected. The go/no-go decision is now its own real search stage;
+               the delete only exists inside a map branch that never executes at
+               all when go=0, making safety independent of dispatch timing. -->
+          <query>| makeresults
+| eval go=if("$cleanup_confirm$"=="yes" AND "$cleanup_person$"!="" AND "$cleanup_vendor$"!="", 1, 0)
+| where go=1
+| map maxsearches=1 search="search `widx` synthetic=\"true\" person_id=\"$cleanup_person$\" vendor=\"$cleanup_vendor$\" | delete | stats sum(deleted) as records_deleted, sum(errors) as errors"</query>
           <earliest>0</earliest>
           <latest>now</latest>
         </search>

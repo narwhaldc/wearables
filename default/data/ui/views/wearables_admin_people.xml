@@ -39,8 +39,8 @@
          are cleared here (load), on action switch, on row-click, and on picking a
          different person to remove — otherwise a prior "Yes" persists and the NEXT
          Submit writes/removes without a fresh confirmation. -->
-    <unset token="manage_confirm"></unset><unset token="do_write"></unset>
-    <unset token="remove_confirm"></unset><unset token="do_remove"></unset>
+    <unset token="manage_confirm"></unset>
+    <unset token="remove_confirm"></unset>
   </init>
   <fieldset submitButton="true" autoRun="false">
     <input type="dropdown" token="paction" searchWhenChanged="true">
@@ -52,14 +52,14 @@
         <condition value="manage">
           <set token="mode_manage">1</set>
           <unset token="mode_remove"></unset>
-          <unset token="manage_confirm"></unset><unset token="do_write"></unset>
-          <unset token="remove_confirm"></unset><unset token="do_remove"></unset>
+          <unset token="manage_confirm"></unset>
+          <unset token="remove_confirm"></unset>
         </condition>
         <condition value="remove">
           <set token="mode_remove">1</set>
           <unset token="mode_manage"></unset>
-          <unset token="manage_confirm"></unset><unset token="do_write"></unset>
-          <unset token="remove_confirm"></unset><unset token="do_remove"></unset>
+          <unset token="manage_confirm"></unset>
+          <unset token="remove_confirm"></unset>
         </condition>
       </change>
     </input>
@@ -111,15 +111,20 @@
       <label>Household (family group; blank = keep)</label>
       <default>$sel_p_household$</default>
     </input>
+    <!-- No <change> handler here on purpose (fixed 2026-10-12, Splunk Cloud
+         10.5.2605.11): a <change>-set token (the old do_write) fires IMMEDIATELY
+         on selection, bypassing the "hold until Submit" deferral that
+         searchWhenChanged=false gives this input's OWN token. Confirmed live:
+         flipping this to "Yes" wrote the registry before Submit was ever
+         clicked. The write row below now depends only on mode_manage and reads
+         $manage_confirm$ directly (a properly-deferred, searchWhenChanged=false
+         token) in its own query text ; the existing "$manage_confirm$"=="yes"
+         guard inside that query is what actually gates the write. -->
     <input type="dropdown" token="manage_confirm" searchWhenChanged="false" depends="$mode_manage$">
       <label>Confirm write</label>
       <choice value="no">No — do not write</choice>
       <choice value="yes">Yes — write this person to the registry</choice>
       <default>no</default>
-      <change>
-        <condition value="yes"><set token="do_write">1</set></condition>
-        <condition value="no"><unset token="do_write"></unset></condition>
-      </change>
     </input>
     <!-- REMOVE inputs -->
     <input type="dropdown" token="r_id" searchWhenChanged="false" depends="$mode_remove$">
@@ -133,18 +138,17 @@
 | table person_id label</query>
       </search>
       <change>
-        <set token="remove_confirm">no</set><unset token="do_remove"></unset>
+        <set token="remove_confirm">no</set>
       </change>
     </input>
+    <!-- No do_remove side-channel <change> handler ; same fix as manage_confirm
+         above. The remove row depends only on mode_remove and reads
+         $remove_confirm$ directly in its own query text. -->
     <input type="dropdown" token="remove_confirm" searchWhenChanged="false" depends="$mode_remove$">
       <label>Confirm remove</label>
       <choice value="no">No — do not remove</choice>
       <choice value="yes">Yes — permanently remove this person's registry row</choice>
       <default>no</default>
-      <change>
-        <condition value="yes"><set token="do_remove">1</set></condition>
-        <condition value="no"><unset token="do_remove"></unset></condition>
-      </change>
     </input>
   </fieldset>
 
@@ -153,7 +157,7 @@
       <html>
         <div style="padding:8px 4px; line-height:1.5">
           <div style="border:2px solid #F4A422; background:rgba(244,164,34,0.12); border-radius:6px; padding:12px 14px; margin-bottom:14px; color:#F4A422; font-weight:600">
-            ⚠ Splunk may show a small <b>"potential security risk"</b> dialog (it approves the <code>outputlookup</code> command) — sometimes right when this page loads, sometimes after you click <b>Submit</b>, depending on the Splunk build. On the dark theme it's easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed. Approving it does <b>not</b> write anything by itself; nothing is actually written until you finish the fields (including <b>Confirm</b>), click <b>Submit</b>, and approve.
+            ⚠ Splunk may show a small <b>"potential security risk"</b> dialog (it approves the <code>outputlookup</code> command) — it can appear when this page loads, when you click a roster row, or after you click <b>Submit</b>; which one varies by Splunk build. It's safe to <b>Cancel</b> or close it any time it isn't what you expect — this dialog only ever approves a command running, it never itself writes anything. On the dark theme it's easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed when you do want to continue. Nothing is actually written to the registry until you finish the fields (including <b>Confirm</b>), click <b>Submit</b>, and approve.
           </div>
           <p>This page maintains the <b>wearable_person_profile</b> registry (KV Store) — the human layer over the opaque, RBAC-gated <code>person_id</code>. Writes are locked to <b>admin/sc_admin</b>; a non-admin who reaches this page can view the roster but any write returns a permission error.</p>
           <ul>
@@ -184,7 +188,7 @@
         <drilldown>
           <set token="paction">manage</set>
           <unset token="mode_remove"></unset>
-          <set token="manage_confirm">no</set><unset token="do_write"></unset>
+          <set token="manage_confirm">no</set>
           <!-- Two-phase, and it must be <set> (not <eval>): <eval> does NOT
                $row.field$-substitute here, it assigns the literal "$row.person_id$".
                <set> substitutes correctly but SKIPS an empty $row.field$ (keeping the
@@ -250,7 +254,7 @@
     </panel>
   </row>
 
-  <row depends="$mode_manage$ $do_write$">
+  <row depends="$mode_manage$">
     <panel>
       <title>Add / Edit result — $p_id$</title>
       <table>
@@ -313,15 +317,26 @@
     </panel>
   </row>
 
-  <row depends="$mode_remove$ $do_remove$">
+  <row depends="$mode_remove$">
     <panel>
       <title>Removed person = $r_id$</title>
       <table>
         <search>
-          <query>| inputlookup wearable_person_profile
-| where person_id!="$r_id$"
-| outputlookup wearable_person_profile
-| stats count as rows_remaining</query>
+          <!-- Safety is NOT just "$remove_confirm$"=="yes" evaluated inline ;
+               confirmed 2026-10-12 that a panel can dispatch before Submit is
+               physically clicked (same root cause as the write-panel bug fixed
+               above), and this query has no append=t safety net the way the
+               write panel does: a bare outputlookup with zero input rows would
+               WIPE the entire registry, not no-op. So the go/no-go decision is
+               made FIRST, as its own real search stage (`where go=1`), and the
+               inputlookup+outputlookup only exist inside a `map` branch that
+               plainly never executes at all ; not even once ; when go=0.
+               This makes safety a property of the search's own execution, not
+               of when the surrounding panel happens to dispatch. -->
+          <query>| makeresults
+| eval go=if("$remove_confirm$"=="yes" AND "$r_id$"!="", 1, 0)
+| where go=1
+| map maxsearches=1 search="| inputlookup wearable_person_profile | where person_id!=\"$r_id$\" | outputlookup wearable_person_profile | stats count as rows_remaining"</query>
           <earliest>-1m</earliest>
           <latest>now</latest>
           <done>
