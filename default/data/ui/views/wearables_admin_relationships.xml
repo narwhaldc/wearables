@@ -182,6 +182,20 @@
           <set token="sel_r_person">$row.person_id$</set>
           <set token="sel_r_rel">$row.relationship$</set>
           <set token="sel_r_can">$row.can_view$</set>
+          <!-- ALSO set the real r_* tokens directly, not just sel_r_* (which only
+               feeds each input's default). Confirmed 2026-10-12 on Splunk Cloud
+               10.5.2605.11: an input's default re-rendering from a changed token
+               updates the DISPLAYED value but not the actual token the form
+               submits (Enterprise 10.6.x re-syncs it fine); same bug found and
+               fixed on wearables_admin_people.xml's person drilldown. -->
+          <set token="r_viewer"></set>
+          <set token="r_person"></set>
+          <set token="r_rel"></set>
+          <set token="r_can"></set>
+          <set token="r_viewer">$row.viewer_splunk_user$</set>
+          <set token="r_person">$row.person_id$</set>
+          <set token="r_rel">$row.relationship$</set>
+          <set token="r_can">$row.can_view$</set>
           <unset token="mode_rmanage"></unset>
           <set token="mode_rmanage">1</set>
         </drilldown>
