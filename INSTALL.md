@@ -9,7 +9,7 @@ in that add-on's own INSTALL:
 - Apple Health ingest → **[TA-apple/INSTALL.md](https://github.com/narwhaldc/TA-apple/blob/main/INSTALL.md)** (Health Auto Export → cloud file-drop → puller; covers Apple Watch + anything in HealthKit)
 - Google Health ingest → **[TA-google/INSTALL.md](https://github.com/narwhaldc/TA-google/blob/main/INSTALL.md)** (OAuth cloud pull; cross-vendor aggregator + universal on-ramp — Apple/Android/Fitbit/Samsung via one API; Samsung specifically needs two Android-side bridges enabled first, see that guide)
 
-**App version:** wearables 0.3.95 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.3.96 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -137,6 +137,18 @@ with no per-person data). It ships **empty** (header only): `medication_name,des
 Add a row per medication as real data shows up — `medication_name` must match the value Health Auto
 Export sends (its `displayText`). No row yet → the reference panel simply stays hidden; dose history
 and the WebMD link still work without it.
+
+### Metabolic Health — Nutrition tab (needs a food-logging app, not a privacy gate)
+The **Metabolic Health → Nutrition** tab shows daily calories and macros, relayed through
+Apple Health's generic `apple:extra` catch-all from whichever food-logging app you use (Cronometer's
+free tier is confirmed reliable; MyFitnessPal has been unreliable in testing). Unlike Medications,
+this isn't gated behind `optional_includes` — it just needs you to actually log food in a
+HealthKit-connected app, with Health Auto Export's **Health Metrics** automation including Dietary
+Energy / Protein / Carbohydrates / Total Fat (or "Select All"). A **Daily Calorie Goal** (intake
+target) can be set per person on **Admin → People &amp; Defaults** — a separate field from the existing
+activity-burn `calorie_goal`, so the two are never conflated. If food is logged in more than one app
+on the same day, the tab sums across them (different apps = different meals, not a double-measured
+quantity); the source caption reads "via multiple sources" when that happens.
 
 ## 5. Multi-user RBAC
 Per-person isolation = a role-level **`srchFilter = person_id="P00x"`** on the indexed `person_id`.

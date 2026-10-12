@@ -8,6 +8,7 @@
     <set token="p_units"></set>
     <set token="p_step"></set>
     <set token="p_cal"></set>
+    <set token="p_dcal"></set>
     <set token="p_dist"></set>
     <set token="p_height"></set>
     <set token="p_birth"></set>
@@ -18,6 +19,7 @@
     <set token="sel_p_units"></set>
     <set token="sel_p_step"></set>
     <set token="sel_p_cal"></set>
+    <set token="sel_p_dcal"></set>
     <set token="sel_p_dist"></set>
     <set token="sel_p_height"></set>
     <set token="sel_p_birth"></set>
@@ -80,6 +82,10 @@
     <input type="text" token="p_cal" searchWhenChanged="false" depends="$mode_manage$">
       <label>Calorie goal (blank = keep)</label>
       <default>$sel_p_cal$</default>
+    </input>
+    <input type="text" token="p_dcal" searchWhenChanged="false" depends="$mode_manage$">
+      <label>Dietary calorie goal (intake target, blank = keep)</label>
+      <default>$sel_p_dcal$</default>
     </input>
     <input type="text" token="p_dist" searchWhenChanged="false" depends="$mode_manage$">
       <label>Distance goal, meters (blank = keep)</label>
@@ -145,7 +151,7 @@
           <ul>
             <li><b>Add / Edit</b> — type the <code>person_id</code> (stored <b>uppercase</b>: <code>p003</code> → <code>P003</code>). A <b>new</b> id creates the row; an <b>existing</b> id edits it. Every field left <b>blank keeps its current value</b> (read-modify-write), so you only fill what you want to change.</li>
             <li><b>Splunk username</b> is the <b>identity map</b> (<code>$env:user$</code> → person_id) — this person's <i>own</i> Splunk login, used to auto-select the logged-in user + their default units. It must be <b>unique</b> (one login = one person); a write reusing a username already mapped elsewhere is <b>blocked</b> and the registry is left unchanged. Leave it <b>blank</b> for people who don't log in themselves — children, elders, or a coworker whose device you ingest. A caregiver is granted access to those dependents via their <b>role's <code>srchFilter</code></b> (RBAC: <code>person_id IN (…)</code>), not this field.</li>
-            <li><b>Default units</b> / <b>goals</b> / <b>height</b> are the per-person display defaults the dashboards read.</li>
+            <li><b>Default units</b> / <b>goals</b> / <b>height</b> are the per-person display defaults the dashboards read. <b>Calorie goal</b> is activity-burn-oriented (used on Today/Activity); <b>Dietary calorie goal</b> is a separate intake target (used on the Nutrition tab) — they are intentionally different fields, not the same number.</li>
             <li><b>Remove</b> deletes a person's registry row (does <b>not</b> delete their indexed data — use <b>Admin: Sample Data → Clean up</b> for synthetic events).</li>
             <li>To seed a brand-new person's demo data after adding them here, use <b>Admin: Sample Data → Create</b>.</li>
           </ul>
@@ -160,10 +166,10 @@
       <table>
         <search>
           <query>| inputlookup wearable_person_profile ```refresh:$roster_refresh$```
-| fillnull value="" splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym household_id
-| eval step_goal=tostring(step_goal), calorie_goal=tostring(calorie_goal), distance_goal_m=tostring(distance_goal_m), height_cm=tostring(height_cm)
+| fillnull value="" splunk_user person_name units step_goal calorie_goal dietary_calorie_goal distance_goal_m height_cm birth_ym household_id
+| eval step_goal=tostring(step_goal), calorie_goal=tostring(calorie_goal), dietary_calorie_goal=tostring(dietary_calorie_goal), distance_goal_m=tostring(distance_goal_m), height_cm=tostring(height_cm)
 | sort person_id
-| table person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym household_id</query>
+| table person_id splunk_user person_name units step_goal calorie_goal dietary_calorie_goal distance_goal_m height_cm birth_ym household_id</query>
         </search>
         <option name="count">50</option>
         <option name="drilldown">row</option>
@@ -183,6 +189,7 @@
           <set token="sel_p_units"></set>
           <set token="sel_p_step"></set>
           <set token="sel_p_cal"></set>
+          <set token="sel_p_dcal"></set>
           <set token="sel_p_dist"></set>
           <set token="sel_p_height"></set>
           <set token="sel_p_birth"></set>
@@ -193,6 +200,7 @@
           <set token="sel_p_units">$row.units$</set>
           <set token="sel_p_step">$row.step_goal$</set>
           <set token="sel_p_cal">$row.calorie_goal$</set>
+          <set token="sel_p_dcal">$row.dietary_calorie_goal$</set>
           <set token="sel_p_dist">$row.distance_goal_m$</set>
           <set token="sel_p_height">$row.height_cm$</set>
           <set token="sel_p_birth">$row.birth_ym$</set>
@@ -221,6 +229,7 @@
 | eval _un = if("$p_units$"=="null",  "", "$p_units$")
 | eval _sg = if("$p_step$"=="null",   "", "$p_step$")
 | eval _cg = if("$p_cal$"=="null",    "", "$p_cal$")
+| eval _dcg = if("$p_dcal$"=="null",   "", "$p_dcal$")
 | eval _dg = if("$p_dist$"=="null",   "", "$p_dist$")
 | eval _hg = if("$p_height$"=="null", "", "$p_height$")
 | eval _by = if("$p_birth$"=="null",  "", "$p_birth$")
@@ -230,6 +239,7 @@
 | eval units           = if(_un!="", _un, units)
 | eval step_goal       = if(_sg=="", step_goal,       tonumber(if(_sg=="","0",_sg)))
 | eval calorie_goal    = if(_cg=="", calorie_goal,    tonumber(if(_cg=="","0",_cg)))
+| eval dietary_calorie_goal = if(_dcg=="", dietary_calorie_goal, tonumber(if(_dcg=="","0",_dcg)))
 | eval distance_goal_m = if(_dg=="", distance_goal_m, tonumber(if(_dg=="","0",_dg)))
 | eval height_cm       = if(_hg=="", height_cm,       tonumber(if(_hg=="","0",_hg)))
 | eval birth_ym        = case(_by=="", birth_ym, match(_by,"^\d{4}-\d{2}$"), _by, true(), birth_ym)
@@ -240,7 +250,7 @@
 | eval blocked=if(splunk_user!="" AND isnotnull(owner) AND owner!=person_id, 1, 0)
 | appendpipe
     [| where blocked=0 AND "$manage_confirm$"=="yes"
-    | table _key person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym household_id
+    | table _key person_id splunk_user person_name units step_goal calorie_goal dietary_calorie_goal distance_goal_m height_cm birth_ym household_id
     | outputlookup append=t wearable_person_profile
     | where 1=2]
 | appendpipe
@@ -252,8 +262,8 @@
     | outputlookup append=t wearable_relationships
     | where 1=2]
 | eval outcome=if(blocked=1, "BLOCKED: Splunk username already maps to ".owner." (registry left unchanged)", if(splunk_user!="", "written (+ self view relationship)", "written"))
-| eval step_goal=tostring(step_goal), calorie_goal=tostring(calorie_goal), distance_goal_m=tostring(distance_goal_m), height_cm=tostring(height_cm)
-| table outcome person_id splunk_user person_name units step_goal calorie_goal distance_goal_m height_cm birth_ym household_id</query>
+| eval step_goal=tostring(step_goal), calorie_goal=tostring(calorie_goal), dietary_calorie_goal=tostring(dietary_calorie_goal), distance_goal_m=tostring(distance_goal_m), height_cm=tostring(height_cm)
+| table outcome person_id splunk_user person_name units step_goal calorie_goal dietary_calorie_goal distance_goal_m height_cm birth_ym household_id</query>
           <earliest>-1m</earliest>
           <latest>now</latest>
           <done>

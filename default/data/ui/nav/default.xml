@@ -6,6 +6,7 @@
   <view name="wearables_wellness" label="Wellness" icon="heart"/>
   <view name="wearables_device" label="Device" icon="gear"/>
   <view name="wearables_medications" label="Medications" icon="clock"/>
+  <view name="wearables_metabolic" label="Metabolic Health" icon="chart"/>
   <collection label="Family" icon="user">
     <view name="wearables_family" label="Overview"/>
     <view name="wearables_family_graph" label="Graph"/>
