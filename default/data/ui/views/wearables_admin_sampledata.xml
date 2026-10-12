@@ -53,6 +53,7 @@
       <choice value="sourcetype=garmin:*">Garmin only</choice>
       <choice value="sourcetype=withings:*">Withings only</choice>
       <choice value="sourcetype=apple:*">Apple / Hume only</choice>
+      <choice value="sourcetype=apple:extra vendor=cronometer">Cronometer only</choice>
       <choice value="sourcetype=google:*">Google only</choice>
     </input>
     <input type="dropdown" token="create_confirm" searchWhenChanged="false" depends="$mode_create$">
