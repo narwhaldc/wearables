@@ -96,7 +96,7 @@
       <html>
         <div style="padding:8px 4px; line-height:1.5">
           <div style="border:2px solid #F4A422; background:rgba(244,164,34,0.12); border-radius:6px; padding:12px 14px; margin-bottom:14px; color:#F4A422; font-weight:600">
-            ⚠ After you click <b>Submit</b>, Splunk shows a small <b>"potential security risk"</b> dialog (it approves the <code>collect</code>/<code>delete</code> command). On the dark theme it's easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed. This is Splunk's built-in safeguard, expected for this tool.<br/><br/>
+            ⚠ Splunk may show a small <b>"potential security risk"</b> dialog (it approves the <code>collect</code>/<code>delete</code> command) — sometimes right when this page loads, sometimes after you click <b>Submit</b>, depending on the Splunk build. On the dark theme it's easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed. This is Splunk's built-in safeguard, expected for this tool.<br/><br/>
             <b>Don't worry</b> — nothing runs until you finish the pickers (including <b>Confirm</b>) and click <b>Submit</b>, so it's safe to look around. If you <b>Cancel</b> the dialog, that run is aborted (nothing was created or deleted) — just click <b>Submit</b> again and choose <b>"Run Query Anyway."</b>
           </div>
           <p>Pick an <b>Action</b> above. Only the selected action's options and result appear, and each action runs only on <b>Submit</b> — so a Create submit can never trigger a delete, and vice versa.</p>

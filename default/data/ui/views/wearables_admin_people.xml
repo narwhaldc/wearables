@@ -153,7 +153,7 @@
       <html>
         <div style="padding:8px 4px; line-height:1.5">
           <div style="border:2px solid #F4A422; background:rgba(244,164,34,0.12); border-radius:6px; padding:12px 14px; margin-bottom:14px; color:#F4A422; font-weight:600">
-            ⚠ After you click <b>Submit</b>, Splunk shows a small <b>"potential security risk"</b> dialog (it approves the <code>outputlookup</code> command). On the dark theme it's easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed. Nothing is written until you finish the fields (including <b>Confirm</b>), click <b>Submit</b>, and approve.
+            ⚠ Splunk may show a small <b>"potential security risk"</b> dialog (it approves the <code>outputlookup</code> command) — sometimes right when this page loads, sometimes after you click <b>Submit</b>, depending on the Splunk build. On the dark theme it's easy to miss — look near the <b>center of the screen</b> and click <b>"Run Query Anyway"</b> to proceed. Approving it does <b>not</b> write anything by itself; nothing is actually written until you finish the fields (including <b>Confirm</b>), click <b>Submit</b>, and approve.
           </div>
           <p>This page maintains the <b>wearable_person_profile</b> registry (KV Store) — the human layer over the opaque, RBAC-gated <code>person_id</code>. Writes are locked to <b>admin/sc_admin</b>; a non-admin who reaches this page can view the roster but any write returns a permission error.</p>
           <ul>
