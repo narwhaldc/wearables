@@ -24,6 +24,8 @@ Quick start + all repo links are on the in-app **Overview** page. Per-vendor ing
   `wearable_identity_map`. Admin/sc_admin write-locked; survive app upgrades (unlike shipped CSVs).
 - `default/savedsearches.conf` — index dedup maintenance (+1h after oura_health) + a nightly
   registry backup to the index.
+- `tools/master_fetcher.py` (+ `master_fetcher_config*.json`) — **repo-only** (never in the `.spl`): one cron line that runs every vendor's
+  sync on its own interval, incl. isolated extra per-person instances (see INSTALL → *master fetcher*).
 - `default/macros.conf` — search macros (see *Searching your data* below): `` `widx` `` / `` `wlogidx` ``
   (index knobs), `` `withnames` `` (person_id→name), `` `dedup_workouts` `` (cross-vendor session dedup).
 

@@ -9,7 +9,7 @@ in that add-on's own INSTALL:
 - Apple Health ingest → **[TA-apple/INSTALL.md](https://github.com/narwhaldc/TA-apple/blob/main/INSTALL.md)** (Health Auto Export → cloud file-drop → puller; covers Apple Watch + anything in HealthKit)
 - Google Health ingest → **[TA-google/INSTALL.md](https://github.com/narwhaldc/TA-google/blob/main/INSTALL.md)** (OAuth cloud pull; cross-vendor aggregator + universal on-ramp — Apple/Android/Fitbit/Samsung via one API; Samsung specifically needs two Android-side bridges enabled first, see that guide)
 
-**App version:** wearables 0.4.18 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
+**App version:** wearables 0.4.19 · Apache-2.0 · Source: https://github.com/narwhaldc/wearables
 
 ---
 
@@ -31,7 +31,7 @@ in that add-on's own INSTALL:
 ## Architecture
 ```
 Oura Ring ─▶ TA-oura/tools/oura_to_hec_with_phi.py  (pull, OAuth2)
-Garmin    ─▶ TA-garmin/tools/garmin_to_hec.py       (pull, python-garminconnect)
+Garmin    ─▶ TA-garmin/tools/garmin_to_hec.py       (pull: login route or the official Personal API key)
 Withings  ─▶ TA-withings/tools/withings_to_hec.py   (pull, OAuth2)
 Apple/iOS ─▶ Health Auto Export (iOS) → cloud file-drop → TA-apple/tools/apple_to_hec.py  (pull, files)
                          │  HEC: index=wearables, sourcetype=<vendor>:<type>,
@@ -60,7 +60,7 @@ internet-facing. Ingest scripts are **repo-only** (never shipped in a `.spl` —
 ## Prerequisites
 - Splunk Enterprise 10.x or Splunk Cloud, with HTTP Event Collector enabled.
 - Admin (install apps, create index, populate KV registries, set roles).
-- A host with **Python 3.9+** (Oura fetcher) / **3.10+** (Garmin poller — `garminconnect` needs it).
+- A host with **Python 3.9+** (Oura fetcher) / **3.10+** (Garmin *login* poller — `garminconnect` needs it; the Garmin *Personal API* backend needs only 3.9+ and `requests`).
 - Vendor credentials: an Oura developer app (OAuth2), a Garmin account, and/or Withings OAuth2 (see the
   TA INSTALLs). Apple Health needs no credentials — the iOS Health Auto Export app + a synced cloud folder.
 
@@ -99,7 +99,7 @@ Install (Apps → Install app from file) and **restart Splunk** so custom-viz JS
 ## 3. Set up vendor ingest
 Copy the vendor's script from its add-on `tools/` to your ingest host and follow that add-on's INSTALL:
 - **Oura:** `oura_to_hec_with_phi.py` — OAuth2 `--auth`, `oura_targets.json`. See **TA-oura/INSTALL.md**.
-- **Garmin:** `garmin_to_hec.py` — one-time `garmin_probe.py` login, `garmin_targets.json`. See **TA-garmin/INSTALL.md**.
+- **Garmin:** `garmin_to_hec.py` — either the one-time `garmin_probe.py` login, **or** Garmin's official **Personal API** key (`GARMIN_BACKEND=personal`; no password, 1-year-max key, with expiry warnings on **Ingest Health**), plus `garmin_targets.json`. See **TA-garmin/INSTALL.md**.
 - **Withings:** `withings_to_hec.py` — OAuth2 `--auth`, `withings_targets.json`. See **TA-withings/INSTALL.md**.
 - **Apple Health:** no vendor API — the iOS **Health Auto Export** app (its **automatic/scheduled
   export requires the paid subscription**) writes JSON export files to a
@@ -111,6 +111,24 @@ Copy the vendor's script from its add-on `tools/` to your ingest host and follow
 
 All point HEC at `index=wearables` and stamp indexed `vendor` + `person_id`. Targets files hold
 tokens → **gitignored, never commit** (all add-ons enforce this).
+
+### Optional: one cron for all vendors — the master fetcher
+`tools/master_fetcher.py` (in this repo's `tools/`, **not** in the `.spl`) runs every vendor's sync in **one
+process** from **one cron line**, each vendor on its own interval (`tools/master_fetcher_config.json`; copy
+from `master_fetcher_config.example.json`). It expects the vendor add-on repos beside this one
+(`~/src/TA-oura`, `~/src/TA-garmin`, …), i.e. `~/src/wearables/tools` next to `~/src/TA-*/tools`:
+```cron
+*/10 * * * * cd /home/USER/src/wearables/tools && python3.11 ./master_fetcher.py >> /var/log/master_fetcher.log 2>&1
+```
+Add the log to your logrotate. Useful flags: `--only oura,garmin`, `--force` (ignore intervals), `--dry-run`.
+**More than one person per vendor** (e.g. two Garmin accounts): list the extras as isolated **instances**
+under that vendor in the config —
+`"garmin": {"interval_minutes": 60, "instances": [{"name": "NAME", "dir": "tools_NAME"}]}` — each a copy of
+the vendor script in `~/src/TA-garmin/tools_NAME/` with **its own** `.env`/targets/state. They run as
+separate subprocesses with a clean environment (a shared environment would leak one person's credentials
+into another's run); `--only garmin:NAME` runs just one, and a `--backfill` never touches an instance
+unless it is named. Details: **TA-garmin/INSTALL.md §7b**. Run big backfills **outside** the master (`nohup`
+in the person's folder) so they do not hold its lock.
 
 ## 4. Populate the KV registries
 Admin-managed enrichment (KV Store in this app; write-locked to admin/sc_admin; survive upgrades).

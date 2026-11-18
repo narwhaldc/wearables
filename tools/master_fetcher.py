@@ -43,6 +43,15 @@ collides. This was IMPOSSIBLE when each fetcher ran in its own OS process
 (separate environments); it becomes a live risk here only if a future .env
 edit reuses one of those generic names in a second fetcher.
 
+EXTRA INSTANCES (e.g. a second/third Garmin person): list them under a vendor in
+master_fetcher_config.json -> "instances": [{"name": "simon", "dir": "tools_simon"}]. Each is
+a full copy of the vendor script living in ~/src/<TA-repo>/<dir>/ with ITS OWN .env/targets/
+state, and is run as a SUBPROCESS (clean env, cwd = its dir) after the vendor's main run, on its
+own interval, with output forwarded to this log. They are never run in-process: the shared
+os.environ would leak one person's credentials into another's run. --only vendor runs the vendor
+and its instances; --only vendor:name runs just that instance. A --backfill only touches an
+instance if it is named explicitly (vendor:name) - never as a side effect of --only vendor.
+
 Usage:
     python master_fetcher.py                  # run all 5 vendors
     python master_fetcher.py --only oura,garmin
@@ -57,6 +66,11 @@ import os
 import sys
 import time
 from pathlib import Path
+
+# Pristine environment, captured BEFORE any vendor module is imported (each vendor's load_dotenv()
+# writes its .env into os.environ, "first import wins"). Extra per-person instances run in a
+# SUBPROCESS with THIS env so they never inherit another person's key/credentials/backend.
+ORIG_ENV = dict(os.environ)
 
 HERE = Path(__file__).resolve().parent
 SRC_ROOT = HERE.parent.parent  # .../wearables/tools -> .../wearables -> ~/src
@@ -204,6 +218,55 @@ RUNNERS = {
 }
 
 
+def _run_instances(vendor, repo_dir, module_name, config, state, args, wanted_inst, results, restrict=False):
+    """Run a vendor's EXTRA instances (config -> vendor.instances) as isolated subprocesses."""
+    import subprocess
+    for inst in (config.get(vendor) or {}).get("instances", []):
+        name, sub_dir = inst.get("name"), inst.get("dir")
+        if not name or not sub_dir:
+            print(f"[{vendor}] bad instance entry (needs name + dir): {inst}", file=sys.stderr)
+            continue
+        key, explicit = f"{vendor}:{name}", f"{vendor}:{name}" in wanted_inst
+        if restrict and not explicit:
+            continue                      # --only vendor:name selected OTHER instances only
+        if args.backfill and not explicit:
+            continue                      # never backfill a person as a side effect of --only vendor
+        interval = inst.get("interval_minutes", (config.get(vendor) or {}).get("interval_minutes", DEFAULT_INTERVAL_MINUTES))
+        if not args.force and not explicit and not args.backfill and state.get(key) is not None \
+                and (time.time() - state[key]) < interval * 60:
+            print(f"[{key}] not due yet (interval={interval}m, last run {round((time.time() - state[key]) / 60, 1)}m ago)")
+            results[key] = {"skipped": "not_due"}
+            continue
+        inst_dir = SRC_ROOT / repo_dir / sub_dir
+        script = inst_dir / f"{module_name}.py"
+        if not script.is_file():
+            print(f"[{key}] FAILED: {script} not found", file=sys.stderr)
+            results[key] = {"error": f"{script} not found"}
+            continue
+        cmd = [sys.executable, str(script)]
+        if args.dry_run:
+            cmd.append("--dry-run")
+        if args.backfill:
+            cmd += ["--backfill", args.backfill] + (["--backfill-end", args.backfill_end] if args.backfill_end else [])
+        vt0 = time.time()
+        try:
+            # ORIG_ENV (not os.environ!): see the module note - no leakage between people.
+            r = subprocess.run(cmd, cwd=str(inst_dir), env=ORIG_ENV, capture_output=True, text=True,
+                               timeout=inst.get("timeout_s", 4 * 3600))
+            sys.stdout.write(r.stdout)
+            sys.stderr.write(r.stderr)
+            if r.returncode != 0:
+                raise RuntimeError(f"exit {r.returncode}")
+            results[key] = {"ok": True}
+            print(f"[{key}] ok in {round(time.time() - vt0, 1)}s")
+            if not args.dry_run:
+                state[key] = time.time()
+                _save_json(STATE_FILE, state)
+        except Exception as e:
+            print(f"[{key}] FAILED after {round(time.time() - vt0, 1)}s: {type(e).__name__}: {e}", file=sys.stderr)
+            results[key] = {"error": str(e)}
+
+
 def main():
     ap = argparse.ArgumentParser(description="Wearables master fetcher — runs all vendor syncs in one process.")
     ap.add_argument("--only", metavar="vendor1,vendor2", help="limit to these vendors (comma-separated)")
@@ -214,9 +277,13 @@ def main():
     args = ap.parse_args()
 
     wanted = set(args.only.split(",")) if args.only else {v for v, _, _ in VENDORS}
+    # "vendor:instance" selects one extra instance (and not the vendor's main run)
+    wanted_inst = {w for w in wanted if ":" in w}
+    wanted = {w.split(":")[0] for w in wanted}
     unknown = wanted - {v for v, _, _ in VENDORS}
     if unknown:
         sys.exit(f"error: unknown vendor(s) in --only: {', '.join(sorted(unknown))}")
+    only_instances = {w.split(":")[0] for w in wanted_inst} - ({a for a in (args.only or "").split(",") if ":" not in a})
 
     master_fp = _acquire_lock(MASTER_LOCK_FILE)
     if master_fp is None:
@@ -232,6 +299,9 @@ def main():
     results = {}
     for vendor, repo_dir, module_name in VENDORS:
         if vendor not in wanted:
+            continue
+        if vendor in only_instances:
+            _run_instances(vendor, repo_dir, module_name, config, state, args, wanted_inst, results, restrict=True)
             continue
         # A deliberate backfill is an explicit one-off action, not a regular scheduled
         # sync -- it shouldn't be silently skipped as "not due yet", same as --force.
@@ -280,6 +350,7 @@ def main():
                     _release_lock(lock_fp, vendor_lock)
         finally:
             os.chdir(orig_cwd)
+        _run_instances(vendor, repo_dir, module_name, config, state, args, wanted_inst, results)
 
     failed = [v for v, r in results.items() if isinstance(r, dict) and "error" in r]
     print(f"\nmaster_fetcher complete in {round(time.time() - t0, 1)}s — "
